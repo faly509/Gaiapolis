@@ -1,93 +1,72 @@
-# Changelog — EcoCity Engine
+# Changelog — Gaiapolis / EcoCity Engine
 
-Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
+Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
----
+## [0.1.5.1] — 2026 — Stabilisation OSM
+
+### Corrigé
+- Blocage des constructions sur une tuile déjà occupée par le joueur.
+- Hydrolienne limitée aux rivières ou plans d’eau avec courant suffisant.
+- Micro-centrale limitée à l’eau avec débit et dénivelé suffisants.
+- Optimiseur aligné sur les mêmes règles centralisées de placement.
+- Anneau du score Canvas : résolution correcte des couleurs CSS.
+- Sauvegarde migrée vers la clé `eco0151`, avec lecture de compatibilité `eco015`.
+
+### Ajouté
+- Interrupteur d’affichage des données OpenStreetMap.
+- Rechargement du secteur réel autour du lieu courant.
+- Structure de code séparée en fichiers CSS et JavaScript spécialisés.
+
+## [0.1.5] — 2026 — Territoire réel expérimental
+
+### Ajouté
+- Intégration Overpass API dans un rayon limité autour du lieu choisi.
+- Projection simplifiée des bâtiments, routes, rivières et plans d’eau OpenStreetMap sur la grille.
+- Types de tuiles `land`, `water`, `river`, `road` et `existing_building`.
+- Bâtiments existants affichés comme volumes gris-bleu non constructibles.
+- Fonction centrale `canPlaceBuilding()` pour les contraintes de construction.
+- Score écologique, score d’autarcie et confiance estimés pour les bâtiments OSM.
+- Statistiques du secteur réel et fallback vers le terrain simulé si Overpass échoue.
 
 ## [0.1.4] — 2025 — Premier prototype public
 
-### Refonte complète (réécriture depuis v0.1.3)
+### Modifié
+- Réorganisation du prototype en sections fonctionnelles cohérentes.
+- Refonte du design, du tableau de bord, du tutoriel et des objectifs.
 
-**Architecture**
-- Code réorganisé en 12 sections commentées (DATA / TERRAIN / SIMULATION / RENDERER / TOOLTIP / UI / OBJECTIVES / TUTORIAL / OPTIMIZER / DASHBOARD / SAVE / LOOP)
-- Suppression de toute duplication de logique
-- Nommage unifié et cohérent dans tout le fichier
+### Corrigé
+- Affichage du lieu et des données climatiques.
+- Pénalités de pente et d’inondation dans le score de placement.
+- Affichage numérique du CO₂.
+- Dépendance des productions hydro et géothermique aux ressources de la tuile.
 
-**Corrections de bugs (tous les bugs v0.1.3 corrigés)**
-- `showLocCard()` : utilise `$t()` partout — les champs lieu/coords/biome/temp/rad/vent/pluie s'affichent correctement
-- `placeSc()` : formule corrigée — `s -= floodRisk*40 + slope*20` (les deux sont des pénalités)
-- CO₂ : affichage correct avec valeur numérique (`+720 kg` / `-180 kg`)
-- Optimiseur : filtre uniquement les tuiles libres (`!placed[k]`)
-- Simulation hydrolienne : dépend réellement de `hydrologicalFlow`
-- Simulation micro-centrale : dépend de `hydrologicalFlow` × bonus `slope`
-- Simulation géothermie : dépend de `geothermalPotential`
-- Fallback robuste si API externes indisponibles
-
-**Nouvelles fonctionnalités**
-- Panneau lieu réel complet : lieu, coords, biome, temp, rayonnement, vent, pluie + mini-barres
-- Disclaimer prototype visible + attribution sources (Open-Meteo / Nominatim)
-- Tooltip étendu : 8 indicateurs + tags de recommandation colorés
-- Material dialog avec description courte de chaque matériau
-- Métriques colorées (vert/orange/rouge selon valeur)
-- Score ring animé avec couleur selon niveau
-- Tutoriel 4 étapes reconstruit
-- Feedback placement enrichi : raisons spécifiques pour optimal et mauvais placement
-- Overlays de couches 15% plus intenses (meilleure lisibilité)
-
-**Design**
-- Redesign complet du design system (couleurs, espacements, typographie)
-- Header épuré avec outil courant et score global
-- Sidebar droite avec scroll indépendant
-- Objectives avec animation de complétion (shimmer + scale)
-- KPI CO₂ avec unité affichée
-
----
+### Ajouté
+- Panneau de lieu réel et attribution des sources.
+- Tooltip environnemental détaillé.
+- Feedback de placement et effets de particules.
 
 ## [0.1.3] — 2025 — Stabilisation
 
-### Corrections
-- `showLocInfo()` : `$t()` au lieu de `$()` pour les champs lieu
-- `placeSc()` : pénalité pente corrigée
-- CO₂ : valeur numérique affichée
-- Système de particules (sparkle) ajouté
-- Overlays de couches renforcés (alpha +40%)
-- Objectifs : badges de progression animés
-- En-tête MIT, licence, avertissement prototype
+- Corrections de localisation, pente et CO₂.
+- Renforcement des couches environnementales.
+- En-tête MIT et avertissement prototype.
 
----
+## [0.1.2] — 2025 — Terrain climatique et animations
 
-## [0.1.2] — 2025 — Terrain réel + animations
-
-### Ajouté
-- Mode lieu réel : Nominatim + Open-Meteo
-- 8 couches environnementales activables
-- Tooltip intelligent avec 8 indicateurs et recommandations
-- Animations bâtiments : turbines, panneaux solaires brillants, eau animée
-- Tutoriel 4 étapes
-- Effets de placement (vert = bon, rouge = mauvais)
-- 2 nouvelles énergies : hydrolienne, micro-centrale
-
----
+- Mode lieu réel avec Nominatim et Open-Meteo.
+- Huit couches environnementales.
+- Animations des équipements et tutoriel quatre étapes.
+- Hydrolienne et micro-centrale.
 
 ## [0.1.1] — 2025 — MVP étendu
 
-### Ajouté
-- Système de matériaux : 8 matériaux avec propriétés
-- Dialog de sélection de matériau
-- Nouvelles énergies : hydrolienne, micro-centrale, géothermie améliorée
-- Dashboard enrichi (CO₂, solidité, confort, entretien)
-- 6 objectifs avec récompenses
-- Optimiseur de placement
-
----
+- Huit matériaux avec propriétés.
+- Tableau de bord enrichi.
+- Objectifs, récompenses et optimiseur de placement.
 
 ## [0.1.0] — 2025 — Prototype initial
 
-### Ajouté
-- Carte isométrique 18×18
-- Génération de terrain procédurale
-- 13 bâtiments de base
-- Simulation énergie / eau / nourriture
-- Score d'autonomie global
-- Sauvegarde localStorage
-- Architecture modulaire (engine / ui / data)
+- Carte isométrique 18×18.
+- Terrain procédural.
+- Simulation énergie, eau et nourriture.
+- Score d’autonomie et sauvegarde locale.
