@@ -1,0 +1,20 @@
+{
+  "name": "Gaiapolis — EcoCity Engine",
+  "short_name": "Gaiapolis",
+  "description": "Simulateur open-source de territoires écologiques et d'habitats autonomes.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0E1209",
+  "theme_color": "#151C10",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
