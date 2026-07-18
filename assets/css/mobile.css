@@ -17,6 +17,7 @@
   #main-canvas{touch-action:none;cursor:default}
   #hud{height:34px;padding:4px 8px;gap:7px}.hud-stat{font-size:10px}#hud-coord{font-size:9px}.hud-stat:last-child{display:none}
   .sb{position:absolute;z-index:100;top:0;bottom:0;left:0;width:min(88vw,350px);max-width:none;border-right:1px solid var(--b2);box-shadow:8px 0 30px #000b;transform:translateX(-105%);transition:transform .22s ease;will-change:transform}
+  .sb:not(.sb-r){overflow-y:auto;overscroll-behavior:contain}
   .sb.drawer-open{transform:translateX(0)}
   .sb-r{left:auto;right:0;width:min(88vw,370px);border-left:1px solid var(--b2);border-right:0;box-shadow:-8px 0 30px #000b;transform:translateX(105%)}
   .sb-r.drawer-open{transform:translateX(0)}
@@ -41,7 +42,7 @@
 }
 
 @media (max-width:430px){
-  #hud-coord{max-width:46vw}.hud-stat{font-size:9px}.mobile-tool{flex-basis:60px}.h-title{max-width:78px;overflow:hidden;text-overflow:ellipsis}
+  #hud-coord{max-width:46vw}.hud-stat{font-size:9px}.mobile-tool{flex-basis:60px}.h-title{max-width:78px;overflow:hidden;text-overflow:ellipsis}#h-toolname{display:none}
 }
 
 @media (max-width:900px) and (orientation:landscape){
