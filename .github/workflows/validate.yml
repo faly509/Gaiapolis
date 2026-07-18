@@ -1,0 +1,43 @@
+name: Validate static app
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
+          node --check sw.js
+      - name: Validate manifest JSON
+        run: python -m json.tool manifest.webmanifest > /dev/null
+      - name: Verify local assets referenced by index
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          html = Path('index.html').read_text(encoding='utf-8')
+          refs = re.findall(r'(?:src|href)="([^"]+)"', html)
+          missing = []
+          for ref in refs:
+              if ref.startswith(('http://', 'https://', '#', 'data:')):
+                  continue
+              path = Path(ref.split('?', 1)[0])
+              if not path.exists():
+                  missing.append(str(path))
+          if missing:
+              raise SystemExit('Missing referenced assets: ' + ', '.join(missing))
+          print('All local references exist.')
+          PY
