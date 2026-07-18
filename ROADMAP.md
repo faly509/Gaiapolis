@@ -1,122 +1,102 @@
-# 🗺️ Feuille de route — EcoCity Engine
+# 🗺️ Feuille de route — Gaiapolis / EcoCity Engine
 
-Ce document liste les évolutions planifiées par version.
-Les priorités peuvent changer selon les contributions de la communauté.
+Les priorités peuvent évoluer selon les tests et les contributions.
 
----
+## ✅ v0.1.5.1 — Territoire réel expérimental (actuel)
 
-## ✅ v0.1.4 — Prototype public (actuel)
+- [x] Carte isométrique 18×18
+- [x] Simulation énergie, eau, nourriture, coût, CO₂, structure et confort
+- [x] Huit matériaux et seize équipements constructibles
+- [x] Recherche de lieu avec Nominatim
+- [x] Données météo à court terme avec Open-Meteo
+- [x] Bâtiments, routes et eau OpenStreetMap via Overpass
+- [x] Contraintes centralisées avec `canPlaceBuilding()`
+- [x] Blocage des routes, bâtiments existants et tuiles occupées
+- [x] Hydrolienne et micro-hydro soumises à des contraintes strictes
+- [x] Optimiseur limité aux emplacements autorisés
+- [x] Code séparé en fichiers CSS et JavaScript spécialisés
 
-- [x] Carte isométrique 18×18 interactive
-- [x] 8 couches environnementales animées
-- [x] 17 bâtiments, 8 matériaux avec données réelles
-- [x] Simulation énergie / eau / nourriture / CO₂
-- [x] Énergies renouvelables : PV, thermique, éolien, hydrolien, micro-hydro, géothermie
-- [x] Mode lieu réel (Nominatim + Open-Meteo, sans clé API)
-- [x] Optimiseur de placement (top 5 tuiles)
-- [x] 6 objectifs avec récompenses animées
-- [x] Tutoriel 4 étapes
-- [x] Effets particules / feedback visuel
-- [x] Sauvegarde localStorage
-- [x] Licence MIT, README GitHub
+## 📱 v0.2.0 — Mobile-first et qualité technique
 
----
+### Interface
+- [ ] Carte prioritaire en plein écran sur smartphone
+- [ ] Barre de construction tactile en bas
+- [ ] Panneaux coulissants pour lieu, couches et tableau de bord
+- [ ] Boutons et textes adaptés au tactile
+- [ ] Mode portrait utilisable et paysage optimisé
 
-## 🔧 v0.2 — Construction écologique (3–6 mois)
+### Caméra et interactions
+- [ ] Déplacement de la carte au doigt et à la souris
+- [ ] Zoom molette et pincement tactile
+- [ ] Appui long pour consulter une tuile
+- [ ] Recentrage de la carte
 
-### Matériaux
-- [ ] Sélection de matériau par face/composant du bâtiment
-- [ ] Empreinte carbone totale du projet en kg CO₂
-- [ ] Comparaison entre deux designs (panneau côte à côte)
+### PWA
+- [ ] `manifest.webmanifest`
+- [ ] Service worker et cache des ressources locales
+- [ ] Installation sur écran d’accueil
+- [ ] Mode hors ligne pour le terrain simulé
 
-### Météo et saisons
-- [ ] Simulation par saison (printemps / été / automne / hiver)
-- [ ] Variation soleil selon la saison et l'hémisphère
-- [ ] Pluie dynamique → remplissage citernes
-- [ ] Événement : canicule (hausse conso), sécheresse (pénurie eau)
+### Fiabilité
+- [ ] Tests automatiques de `canPlaceBuilding()`
+- [ ] Tests des scores et sauvegardes
+- [ ] Gestion explicite des conflits après rechargement OSM
+- [ ] Vérifications de syntaxe dans GitHub Actions
 
-### Structure
-- [ ] Score de solidité par bâtiment + terrain
-- [ ] Alerte si pente ou sol instable
-- [ ] Dégradation simplifiée sur 10 ans simulés
+## 🌍 v0.3.0 — Données territoriales améliorées
 
-### Confort
-- [ ] Température intérieure simulée (isolation × climat)
-- [ ] Indice de confort affiché par bâtiment
-- [ ] Habitants qui réagissent visuellement
+- [ ] Vraie caméra cartographique avec MapLibre ou Leaflet
+- [ ] Polygones OSM mieux rasterisés sur la grille
+- [ ] Relief et pente issus d’un modèle numérique de terrain
+- [ ] Données solaires historiques adaptées à la planification
+- [ ] Hydrologie et risques mieux documentés
+- [ ] Niveau de confiance visible pour chaque donnée
+- [ ] Export JSON du projet
+- [ ] Partage d’une ville par URL
 
----
+## 🏗️ v0.4.0 — Simulation de l’habitat
 
-## 🌍 v0.3 — Données réelles avancées (6–12 mois)
+- [ ] Température intérieure et besoins de chauffage/refroidissement
+- [ ] Matériaux par composant du bâtiment
+- [ ] Durée de vie et maintenance pluriannuelle
+- [ ] Comparaison de deux conceptions
+- [ ] Saisons, pluie dynamique, sécheresse et canicule
+- [ ] Rapport environnemental simplifié
 
-### Import GIS
-- [ ] PVGIS API pour irradiation solaire réelle
-- [ ] SRTM / OpenTopoData pour le relief (altitude, pente)
-- [ ] OpenStreetMap Overpass pour l'hydrologie
-- [ ] Biome MODIS simplifié
+## 🎮 v0.5.0 — Gameplay et progression
 
-### Carte de terrain
-- [ ] Représentation partielle du relief réel (collines, rivières)
-- [ ] Superposition terrain réel + bâtiments du joueur
+- [ ] Budget initial et contraintes de scénario
+- [ ] Déblocage progressif des technologies
+- [ ] Défis d’autonomie énergétique, hydrique et alimentaire
+- [ ] Tempêtes, inondations et événements climatiques
+- [ ] Habitants et réactions visuelles
 
-### Export
-- [ ] Export JSON du plan de ville
-- [ ] Export rapport PDF simplifié
-- [ ] Partage de ville via URL encodée
+## 🏙️ v0.6.0 — Ville circulaire
 
----
-
-## 🎮 v0.4 — Gameplay et progression (12–18 mois)
-
-### Système de progression
-- [ ] Niveaux de technologie (1→5)
-- [ ] Budget de départ limité
-- [ ] Déblocages progressifs de bâtiments
-
-### Mode défi
-- [ ] "Construire une maison autonome à 80% avec 50 000 €"
-- [ ] "Survivre à une sécheresse de 30 jours"
-- [ ] "Nourrir 20 habitants sans béton"
-- [ ] "100% énergie renouvelable"
-
-### Événements
-- [ ] Tempête (dommages si résistance insuffisante)
-- [ ] Inondation (zones à risque submergées)
-- [ ] Bonus de bonne saison (surplus alimentaire)
-
----
-
-## 🏙️ v0.5 — Ville circulaire (18–24 mois)
-
-- [ ] Réseau de chemins avec accessibilité calculée
-- [ ] Flux de déchets organiques → compost → potagers
-- [ ] Méthanisation (déchets → énergie)
-- [ ] Score économie circulaire
-- [ ] Connexions énergétiques entre bâtiments (réseau virtuel)
-
----
+- [ ] Accessibilité par réseau de chemins
+- [ ] Déchets organiques vers compost et agriculture
+- [ ] Méthanisation
+- [ ] Réseaux énergétiques et hydriques
+- [ ] Score d’économie circulaire
+- [ ] Échelle écovillage puis quartier
 
 ## 🚀 v1.0 — Version stable
 
-- [ ] Tests unitaires complets
-- [ ] Documentation API interne
-- [ ] Traductions (EN, ES, DE)
-- [ ] Mode PWA (hors-ligne)
-- [ ] Marketplace de bâtiments communautaires
-- [ ] Version éducative pour écoles
+- [ ] Architecture TypeScript documentée
+- [ ] Couverture de tests satisfaisante
+- [ ] Interface ordinateur et smartphone stable
+- [ ] PWA installable
+- [ ] Traductions principales
+- [ ] Scénarios éducatifs
+- [ ] Documentation des hypothèses et limites scientifiques
 
----
+## 💡 Backlog
 
-## 💡 Idées futures (backlog)
+- Mode Projet Venus et économie basée sur les ressources
+- Export de rapports PDF
+- Import/export de scénarios communautaires
+- Mode collaboratif
+- Réalité augmentée
+- Export vers des formats d’architecture ou de SIG
 
-- Réalité augmentée (AR sur terrain réel)
-- Export IFC pour logiciels d'architecture
-- Simulation multi-années avec dégradation
-- Mode multijoueur collaboratif
-- Génération automatique de plans de construction
-- Comparaison de plusieurs designs côte à côte
-- Mode Projet Venus (économie basée sur les ressources)
-
----
-
-*Feuille de route mise à jour à chaque release. Proposer des modifications via une issue ou une discussion GitHub.*
+*Construire avec la nature, sans prétendre remplacer l’expertise de terrain.*
