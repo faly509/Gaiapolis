@@ -2,7 +2,7 @@
 
 Les priorités peuvent évoluer selon les tests et les contributions.
 
-## ✅ v0.1.5.1 — Territoire réel expérimental (actuel)
+## ✅ v0.1.5.1 — Territoire réel expérimental
 
 - [x] Carte isométrique 18×18
 - [x] Simulation énergie, eau, nourriture, coût, CO₂, structure et confort
@@ -16,32 +16,35 @@ Les priorités peuvent évoluer selon les tests et les contributions.
 - [x] Optimiseur limité aux emplacements autorisés
 - [x] Code séparé en fichiers CSS et JavaScript spécialisés
 
-## 📱 v0.2.0 — Mobile-first et qualité technique
+## 📱 v0.2.0-alpha — Mobile-first et PWA (version en test)
 
 ### Interface
-- [ ] Carte prioritaire en plein écran sur smartphone
-- [ ] Barre de construction tactile en bas
-- [ ] Panneaux coulissants pour lieu, couches et tableau de bord
-- [ ] Boutons et textes adaptés au tactile
-- [ ] Mode portrait utilisable et paysage optimisé
+- [x] Carte prioritaire en plein écran sur smartphone
+- [x] Barre de construction tactile en bas
+- [x] Panneaux coulissants pour lieu, couches et tableau de bord
+- [x] Boutons et textes adaptés au tactile
+- [x] Mode portrait utilisable et paysage optimisé
 
 ### Caméra et interactions
-- [ ] Déplacement de la carte au doigt et à la souris
-- [ ] Zoom molette et pincement tactile
-- [ ] Appui long pour consulter une tuile
-- [ ] Recentrage de la carte
+- [ ] Déplacement libre de la carte au doigt et à la souris
+- [x] Zoom par boutons et pincement tactile
+- [ ] Appui long pour consulter une tuile sans construire
+- [x] Ajustement/recentrage de la carte à l’écran
+- [ ] Zoom ancré précisément autour du geste ou du pointeur
 
 ### PWA
-- [ ] `manifest.webmanifest`
-- [ ] Service worker et cache des ressources locales
-- [ ] Installation sur écran d’accueil
-- [ ] Mode hors ligne pour le terrain simulé
+- [x] `manifest.webmanifest`
+- [x] Service worker et cache des ressources locales
+- [x] Installation sur écran d’accueil quand le navigateur le permet
+- [x] Mode hors ligne partiel pour le terrain simulé après une première visite
+- [ ] Icônes et polices entièrement locales hors ligne
 
 ### Fiabilité
 - [ ] Tests automatiques de `canPlaceBuilding()`
 - [ ] Tests des scores et sauvegardes
-- [ ] Gestion explicite des conflits après rechargement OSM
-- [ ] Vérifications de syntaxe dans GitHub Actions
+- [x] Gestion explicite des conflits après rechargement OSM
+- [x] Vérifications de syntaxe dans GitHub Actions
+- [ ] Tests de rendu et d’interaction sur plusieurs tailles d’écran
 
 ## 🌍 v0.3.0 — Données territoriales améliorées
 
@@ -85,7 +88,7 @@ Les priorités peuvent évoluer selon les tests et les contributions.
 - [ ] Architecture TypeScript documentée
 - [ ] Couverture de tests satisfaisante
 - [ ] Interface ordinateur et smartphone stable
-- [ ] PWA installable
+- [ ] PWA installable et hors ligne de manière fiable
 - [ ] Traductions principales
 - [ ] Scénarios éducatifs
 - [ ] Documentation des hypothèses et limites scientifiques
