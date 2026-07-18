@@ -1,5 +1,5 @@
 <!--
-Gaiapolis / EcoCity Engine v0.1.5.1
+Gaiapolis / EcoCity Engine v0.2.0-alpha
 Author: Norbert Randriamaitso <norbert.randri@gmail.com>
 License: MIT
 Status: early public prototype — educational estimates, not engineering advice.
@@ -9,15 +9,22 @@ Data: Open-Meteo, Nominatim/OpenStreetMap, Overpass API.
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Gaiapolis — EcoCity Engine v0.1.5.1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="description" content="Gaiapolis, simulateur open-source de territoires écologiques et d'habitats autonomes.">
+<meta name="theme-color" content="#151C10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Gaiapolis — EcoCity Engine v0.2.0-alpha</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/game.css">
+<link rel="stylesheet" href="assets/css/mobile.css">
 </head>
 <body>
 <header id="hdr">
-  <span class="h-logo">🌍</span><span class="h-title">Gaiapolis</span><span class="h-ver">v0.1.5.1</span>
+  <span class="h-logo">🌍</span><span class="h-title">Gaiapolis</span><span class="h-ver">v0.2.0α</span>
   <span class="h-loc" id="h-loc">Terrain simulé</span><div class="h-sep"></div>
   <span class="h-tool">Outil :</span><span id="h-toolname">Maison simple</span><span class="h-pill hp-r" id="h-score">Score 0%</span>
 </header>
@@ -65,6 +72,6 @@ Data: Open-Meteo, Nominatim/OpenStreetMap, Overpass API.
 </div></aside>
 </div>
 <div id="mat-dlg"><div id="mat-box"><h2>🧱 Choisir le matériau</h2><div id="mat-sub"></div><div class="mat-g" id="mat-g"></div><div class="mat-prev" id="mat-prev"></div><div class="dlg-btns"><button class="dbtn dno" onclick="closeMat(false)">Annuler</button><button class="dbtn dok" onclick="closeMat(true)">Construire →</button></div></div></div>
-<script src="assets/js/00-core.js"></script><script src="assets/js/01-data.js"></script><script src="assets/js/02-terrain.js"></script><script src="assets/js/03-osm.js"></script><script src="assets/js/04-simulation.js"></script><script src="assets/js/05-renderer.js"></script><script src="assets/js/06-ui.js"></script><script src="assets/js/07-game.js"></script>
+<script src="assets/js/00-core.js"></script><script src="assets/js/01-data.js"></script><script src="assets/js/02-terrain.js"></script><script src="assets/js/03-osm.js"></script><script src="assets/js/04-simulation.js"></script><script src="assets/js/05-renderer.js"></script><script src="assets/js/06-ui.js"></script><script src="assets/js/07-game.js"></script><script src="assets/js/08-mobile.js"></script>
 </body>
 </html>
