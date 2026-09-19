@@ -2,7 +2,8 @@
 
 /* ═══ F. UI ═════════════════════════════════════════════════ */
 
-let curTool='simple_house', curMat='wood';
+let curTool='simple_house', curMat='wood',inspectMode=false;
+window.toggleInspect=function(){inspectMode=!inspectMode;el('inspect-btn')?.setAttribute('aria-pressed',String(inspectMode));$t('h-toolname',inspectMode?'Inspection':BLDGS[curTool]?.l);};
 
 function buildTools(){
   const g=el('tool-grid');g.innerHTML='';
@@ -12,19 +13,19 @@ function buildTools(){
     b.innerHTML=`${d.dot?`<span class="dot ${d.dot}"></span>`:''}
       <span class="ico">${d.i}</span><span>${d.l}</span>
       ${d.cost?`<span class="cost">${d.cost>=1000?(d.cost/1000).toFixed(0)+'k':d.cost}€</span>`:''}`;
-    b.title=d.desc;
+    b.title=d.desc;b.setAttribute('aria-pressed',String(id===curTool));
     b.addEventListener('click',()=>setTool(id));
     g.appendChild(b);
   });
 }
-function setTool(id){ curTool=id; document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b.dataset.t===id)); $t('h-toolname',BLDGS[id]?.l||id); clearHL(); }
+function setTool(id){ if(!Object.hasOwn(BLDGS,id))return;curTool=id;inspectMode=false;el('inspect-btn')?.setAttribute('aria-pressed','false'); document.querySelectorAll('.tb').forEach(b=>(b.classList.toggle('on',b.dataset.t===id),b.setAttribute('aria-pressed',String(b.dataset.t===id)))); $t('h-toolname',BLDGS[id]?.l||id); clearHL(); }
 
 function buildLayers(){
   const g=el('lyr-list');g.innerHTML='';
   LAYERS.forEach(ld=>{
-    const row=document.createElement('div');row.className='lyr-row';
+    const row=document.createElement('button');row.type='button';row.className='lyr-row';row.setAttribute('aria-pressed',String(LYRON[ld.id]));
     row.innerHTML=`<div class="ldot" style="background:${ld.col}"></div><span>${ld.lbl}</span><div class="ltog${LYRON[ld.id]?' on':''}" id="ltog-${ld.id}"></div>`;
-    row.addEventListener('click',()=>{LYRON[ld.id]=!LYRON[ld.id];el('ltog-'+ld.id).classList.toggle('on',LYRON[ld.id]);});
+    row.addEventListener('click',()=>{LYRON[ld.id]=!LYRON[ld.id];el('ltog-'+ld.id).classList.toggle('on',LYRON[ld.id]);row.setAttribute('aria-pressed',String(LYRON[ld.id]));persistProject();});
     g.appendChild(row);
   });
 }
@@ -48,17 +49,18 @@ function initAcc(){
 
 let dlgMat='wood',pendPl=null;
 function openMatDlg(key,bid){
+  if(worldBusy)return;
   pendPl={key,bid};dlgMat=curMat;
   el('mat-sub').textContent=`Matériau pour : ${BLDGS[bid].i} ${BLDGS[bid].l}`;
   buildMatGrid();updateMatPrev(bid);
-  el('mat-dlg').classList.add('open');
+  el('mat-dlg').classList.add('open');el('mat-g').querySelector('button')?.focus();
 }
 function buildMatGrid(){
   const g=el('mat-g');g.innerHTML='';
   Object.entries(MATS).forEach(([id,m])=>{
-    const c=document.createElement('div');c.className='mc'+(id===dlgMat?' sel':'');c.dataset.m=id;
+    const c=document.createElement('button');c.type='button';c.setAttribute('aria-pressed',String(id===dlgMat));c.className='mc'+(id===dlgMat?' sel':'');c.dataset.m=id;
     c.innerHTML=`<span class="mi">${m.icon}</span><span class="mn">${m.label}</span><span class="ms">Éco:${m.eco}/10</span>`;
-    c.addEventListener('click',()=>{dlgMat=id;document.querySelectorAll('.mc').forEach(x=>x.classList.toggle('sel',x.dataset.m===id));updateMatPrev(pendPl?.bid);});
+    c.addEventListener('click',()=>{dlgMat=id;document.querySelectorAll('.mc').forEach(x=>(x.classList.toggle('sel',x.dataset.m===id),x.setAttribute('aria-pressed',String(x.dataset.m===id))));updateMatPrev(pendPl?.bid);});
     g.appendChild(c);
   });
 }
@@ -77,21 +79,23 @@ function updateMatPrev(bid){
 }
 window.closeMat=function(ok){
   el('mat-dlg').classList.remove('open');
-  if(ok&&pendPl){doPlace(pendPl.key,pendPl.bid,dlgMat);curMat=dlgMat;}
+  if(ok&&pendPl){curMat=dlgMat;doPlace(pendPl.key,pendPl.bid,dlgMat);}
   pendPl=null;
 };
 
 let hR=-1,hC=-1;
 cvs.addEventListener('click',e=>{
+  if(worldBusy)return;
   const rect=cvs.getBoundingClientRect(),{r,c}=s2g(e.clientX-rect.left,e.clientY-rect.top);
   if(!inG(r,c))return;
   const key=`${r},${c}`;
+  if(inspectMode){showTip(e.clientX-rect.left,e.clientY-rect.top,r,c);return;}
   const t=terrain[key]||{};
   if(t.terrainType==='existing_building'&&curTool!=='__erase__'){
     showExistingInfo(t);
     return;
   }
-  if(curTool==='__erase__'){delete placed[key];updateAll();return;}
+  if(curTool==='__erase__'){if(placed[key]){recordEdit();delete placed[key];finishEdit();}return;}
   const d=BLDGS[curTool];if(!d)return;
   const check=canPlaceBuilding(curTool,t,key);
   if(!check.ok){ toast('🚫 '+check.why,'warn'); flashEffect(key,'bd'); return; }
@@ -114,7 +118,11 @@ function showExistingInfo(t){
 }
 
 function doPlace(key,bid,mat){
-  placed[key]={id:bid,mat};
+  if(worldBusy)return false;
+  const check=canPlaceBuilding(bid,terrain[key],key);
+  if(!check.ok){toast(check.why,'warn');return false;}
+  if(BLDGS[bid].mat&&!Object.hasOwn(MATS,mat))return false;
+  recordEdit();placed[key]={id:bid,mat:BLDGS[bid].mat?mat:null};
   const d=BLDGS[bid],t=terrain[key]||{};
   const sc=placeSc(t,d);
   if(sc>72){
@@ -139,8 +147,7 @@ function doPlace(key,bid,mat){
   } else {
     toast(`🏗️ ${d.l} construit (score ${~~sc}/100)`,'info');
   }
-  updateAll();
-  tutNext(bid);
+  tutNext(bid);finishEdit();return true;
 }
 
 cvs.addEventListener('mousemove',e=>{
@@ -151,3 +158,20 @@ cvs.addEventListener('mousemove',e=>{
   $t('hud-coord',inG(r,c)?`Tuile (${r},${c}) — ${terrain[`${r},${c}`]?.bScore>=.7?'🏠 Bon terrain':terrain[`${r},${c}`]?.eScore>=.7?'⚡ Bon potentiel':''}`:'Survole une tuile pour voir ses ressources');
 });
 cvs.addEventListener('mouseleave',()=>{hR=-1;hC=-1;el('tip').style.display='none';});
+
+for(const id of ['loc-lat','loc-lon'])el(id).addEventListener('input',()=>{el('loc-name').value='';});
+el('loc-name').addEventListener('input',()=>{el('loc-lat').value='';el('loc-lon').value='';});
+el('loc-name').addEventListener('keydown',e=>{if(e.key==='Enter')loadRealLocation();});
+document.addEventListener('keydown',e=>{
+  const editing=/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable;
+  if(e.key==='Escape'){closeMat(false);el('tip').style.display='none';}
+  if(el('mat-dlg').classList.contains('open')&&e.key==='Tab'){
+    const focus=[...el('mat-box').querySelectorAll('button')],first=focus[0],last=focus.at(-1);
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
+  if(editing)return;
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redoEdit():undoEdit();}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveGame();}
+  if(e.key.toLowerCase()==='i'&&!e.ctrlKey&&!e.metaKey)toggleInspect();
+});

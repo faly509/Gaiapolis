@@ -21,12 +21,12 @@ const BLDGS={
   hydro_t:{l:'Hydrolienne',i:'🌊',c:CAT.E,cost:18000,maint:500,ep:15,ec:.3,wp:0,wc:0,fp:0,res:0,cf:0,eco:6,str:7,oSun:0,oWnd:0,oWat:.7,oGeo:0,oFlo:.6,mat:false,dot:'dot-e',desc:'Turbine dans un courant d’eau.'},
   micro_hydro:{l:'Micro-centrale',i:'⚡',c:CAT.E,cost:25000,maint:600,ep:30,ec:.5,wp:0,wc:0,fp:0,res:0,cf:0,eco:5,str:9,oSun:0,oWnd:0,oWat:.7,oGeo:0,oFlo:.5,mat:false,dot:'dot-e',desc:'Nécessite eau, débit et dénivelé.'},
   geothermal:{l:'Géothermie',i:'🌋',c:CAT.E,cost:35000,maint:500,ep:18,ec:1,wp:0,wc:10,fp:0,res:0,cf:0,eco:8,str:9,oSun:0,oWnd:0,oWat:0,oGeo:.6,oFlo:0,mat:false,dot:'dot-e',desc:'Énergie continue avec potentiel suffisant.'},
-  battery:{l:'Batterie',i:'🔋',c:CAT.E,cost:10000,maint:200,ep:0,ec:.5,wp:0,wc:0,fp:0,res:0,cf:0,eco:2,str:5,oSun:0,oWnd:0,oWat:0,oGeo:0,oFlo:0,mat:false,dot:'dot-e',desc:'Stocke l’énergie excédentaire.'},
-  rain_tank:{l:'Citerne pluie',i:'💧',c:CAT.W,cost:3000,maint:100,ep:0,ec:.2,wp:150,wc:0,fp:0,res:0,cf:0,eco:6,str:6,oSun:0,oWnd:0,oWat:.5,oGeo:0,oFlo:0,mat:false,dot:'dot-w',desc:'Collecte l’eau de pluie.'},
-  greywater:{l:'Recyclage eau',i:'♻️',c:CAT.W,cost:4500,maint:200,ep:0,ec:.5,wp:100,wc:0,fp:0,res:0,cf:0,eco:7,str:5,oSun:0,oWnd:0,oWat:0,oGeo:0,oFlo:0,mat:false,dot:'dot-w',desc:'Traite les eaux grises.'},
+  battery:{l:'Batterie',i:'🔋',c:CAT.E,cost:10000,maint:200,ep:0,ec:.5,wp:0,wc:0,fp:0,res:0,cf:0,eco:2,str:5,oSun:0,oWnd:0,oWat:0,oGeo:0,oFlo:0,mat:false,dot:'dot-e',desc:'Capacité théorique de 10 kWh, aucune production d’énergie.'},
+  rain_tank:{l:'Citerne pluie',i:'💧',c:CAT.W,cost:3000,maint:100,ep:0,ec:.2,wp:150,wc:0,fp:0,res:0,cf:0,eco:6,str:6,oSun:0,oWnd:0,oWat:.5,oGeo:0,oFlo:0,mat:false,dot:'dot-w',desc:'Collecte la pluie sur les toitures des logements.'},
+  greywater:{l:'Recyclage eau',i:'♻️',c:CAT.W,cost:4500,maint:200,ep:0,ec:.5,wp:100,wc:0,fp:0,res:0,cf:0,eco:7,str:5,oSun:0,oWnd:0,oWat:0,oGeo:0,oFlo:0,mat:false,dot:'dot-w',desc:'Recycle une partie des eaux domestiques, non potable.'},
   garden:{l:'Potager',i:'🌱',c:CAT.F,cost:500,maint:100,ep:0,ec:0,wp:0,wc:50,fp:800,res:0,cf:2,eco:8,str:1,oSun:.6,oWnd:.1,oWat:.4,oGeo:0,oFlo:0,mat:false,dot:'dot-f',desc:'Production selon soleil, eau et fertilité.'},
   greenhouse:{l:'Serre',i:'🏗️',c:CAT.F,cost:8000,maint:400,ep:0,ec:2,wp:0,wc:80,fp:2000,res:0,cf:1,eco:6,str:4,oSun:.7,oWnd:0,oWat:.4,oGeo:0,oFlo:0,mat:false,dot:'dot-f',desc:'Production protégée toute l’année.'},
-  compost:{l:'Composteur',i:'🍂',c:CAT.F,cost:600,maint:50,ep:0,ec:0,wp:0,wc:5,fp:200,res:0,cf:0,eco:9,str:1,oSun:.3,oWnd:.1,oWat:.3,oGeo:0,oFlo:0,mat:false,dot:'dot-f',desc:'Valorise les déchets organiques.'},
+  compost:{l:'Composteur',i:'🍂',c:CAT.F,cost:600,maint:50,ep:0,ec:0,wp:0,wc:5,fp:0,res:0,cf:0,eco:9,str:1,oSun:.3,oWnd:.1,oWat:.3,oGeo:0,oFlo:0,mat:false,dot:'dot-f',desc:'Avec des habitants, améliore de 15 % les cultures voisines.'},
   path:{l:'Chemin',i:'🛤️',c:CAT.I,cost:300,maint:20,ep:0,ec:0,wp:0,wc:0,fp:0,res:0,cf:1,eco:4,str:2,oSun:0,oWnd:0,oWat:0,oGeo:0,oFlo:0,mat:false,dot:null,desc:'Améliore l’accessibilité.'},
   hall:{l:'Salle commune',i:'🏛️',c:CAT.I,cost:40000,maint:1500,ep:0,ec:8,wp:0,wc:100,fp:0,res:0,cf:5,eco:3,str:8,oSun:.5,oWnd:0,oWat:.2,oGeo:0,oFlo:0,mat:true,dot:'dot-h',desc:'Améliore le confort collectif.'},
   __erase__:{l:'Effacer',i:'🧹',c:'erase',cost:0,maint:0,ep:0,ec:0,wp:0,wc:0,fp:0,res:0,cf:0,eco:0,str:0,oSun:0,oWnd:0,oWat:0,oGeo:0,oFlo:0,mat:false,dot:null,desc:'Supprime un bâtiment du joueur.'}
@@ -47,10 +47,10 @@ const LYRON={sun:true,wind:true,water:true,fert:false,stab:false,geo:false,flood
 
 const OBJECTIVES=[
 {id:'home',ico:'🏠',txt:'Loger 4 habitants',chk:s=>s.res>=4,prg:s=>`${s.res}/4`},
-{id:'e50',ico:'⚡',txt:'50% autonomie énergétique',chk:s=>s.eA>=50,prg:s=>`${~~s.eA}%`},
-{id:'w50',ico:'💧',txt:'50% autonomie en eau',chk:s=>s.wA>=50,prg:s=>`${~~s.wA}%`},
+{id:'e50',ico:'⚡',txt:'50% autonomie énergétique',chk:s=>s.res>0&&s.eA>=50,prg:s=>`${~~s.eA}%`},
+{id:'w50',ico:'💧',txt:'50% autonomie en eau',chk:s=>s.res>0&&s.wA>=50,prg:s=>`${~~s.wA}%`},
 {id:'food',ico:'🌱',txt:'Produire de la nourriture',chk:s=>s.fP>0,prg:s=>s.fP>0?'✓':'0'},
-{id:'budget',ico:'💰',txt:'Budget ≤ 200 000 €',chk:s=>s.cost>0&&s.cost<=200000,prg:s=>`${~~(s.cost/1000)}k€`},
+{id:'budget',ico:'💰',txt:'Budget ≤ 200 000 €',chk:s=>s.res>0&&s.cost>0&&s.cost<=200000,prg:s=>`${~~(s.cost/1000)}k€`},
 {id:'g60',ico:'🏆',txt:'Score global ≥ 60%',chk:s=>s.auto>=60,prg:s=>`${~~s.auto}%`}
 ];
 const REWDS={

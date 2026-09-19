@@ -20,6 +20,8 @@ jobs:
         run: |
           find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
           node --check sw.js
+      - name: Test simulation, placement and persistence
+        run: node --test tests/*.test.cjs
       - name: Validate manifest JSON
         run: python -m json.tool manifest.webmanifest > /dev/null
       - name: Verify local assets referenced by index

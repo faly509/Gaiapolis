@@ -3,7 +3,7 @@
 **Prototype open source de simulation de ville écologique et d’habitat autonome**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.2.0--alpha-orange.svg)]()
+[![Version](https://img.shields.io/badge/version-0.2.1--alpha-orange.svg)]()
 [![Status](https://img.shields.io/badge/status-public%20prototype-yellow.svg)]()
 [![Data](https://img.shields.io/badge/data-Open--Meteo%20%2B%20OpenStreetMap-blue.svg)]()
 [![Validate static app](https://github.com/faly509/Gaiapolis/actions/workflows/validate.yml/badge.svg)](https://github.com/faly509/Gaiapolis/actions/workflows/validate.yml)
@@ -16,7 +16,21 @@ Gaiapolis est un simulateur écologique jouable dans le navigateur. Le joueur ch
 
 > 🚧 **Statut :** prototype public expérimental. Les données, scores et recommandations sont des estimations simplifiées à but éducatif. Ce projet ne remplace pas une étude d’ingénierie, d’urbanisme ou de construction.
 
-## ✨ Fonctionnalités v0.2.0-alpha
+## ✨ Fonctionnalités v0.2.1-alpha
+
+### Nouveautés : fiabilité et autonomie
+
+- Sauvegarde automatique, copie de récupération, export/import JSON validé et retour à la carte précédente
+- Annuler/rétablir les 40 dernières constructions ou suppressions (Ctrl+Z / Ctrl+Maj+Z)
+- Déplacement de la carte, zoom à la molette ou au pincement, appui long / clic droit / mode Inspection
+- Diagnostic de la ressource manquante et propositions de constructions avec gain estimé
+- Comparaison de conditions sèches, peu ensoleillées et peu venteuses, sans modifier la partie
+- Électricité et chaleur utile distinguées; eau de pluie limitée aux toits; eaux grises limitées aux habitants
+- Compost voisin utile aux cultures; isolation prise en compte dans la demande énergétique
+- Météo correctement convertie de MJ/m² en kWh/m²/j; valeurs zéro préservées
+- Échec réseau : partie conservée, ou repli OSM explicitement signalé
+- Icônes locales et cache PWA limité aux ressources de cette application
+- Tests métier exécutables avec `node --test tests/*.test.cjs`
 
 ### Simulation et territoire
 
@@ -58,6 +72,14 @@ python3 -m http.server 8080
 Puis ouvrir `http://localhost:8080`.
 
 Un serveur local est recommandé pour que les appels réseau vers Open-Meteo, Nominatim et Overpass se comportent comme sur GitHub Pages. Le service worker est volontairement activé uniquement sur le site GitHub Pages officiel afin d’éviter les caches gênants en développement local.
+
+## 🧪 Vérifier les règles
+
+```bash
+node --test tests/*.test.cjs
+```
+
+La suite utilise uniquement le moteur de test intégré à Node.js, sans dépendance à installer. Les services externes sont simulés dans les tests d’échec; leur disponibilité n’est pas garantie par cette suite.
 
 ## 🎮 Comment jouer
 
@@ -116,13 +138,25 @@ Pour limiter les régressions :
 4. tester ordinateur, smartphone, terrain simulé et mode OSM ;
 5. ouvrir une pull request décrivant les changements et limites.
 
+## 🔒 Sauvegarde et version de travail
+
+Cette version part du prototype mobile `174ab03f640fd8b80f57b8e74325853257c66821`, avec deux points de retour créés avant modification :
+
+- `backup/2026-09-19-main` : version publique `de1bbe0fb9e476adfc2a95739d9a70842b071da3`;
+- `backup/2026-09-19-mobile` : prototype mobile `174ab03f640fd8b80f57b8e74325853257c66821`.
+
+Les changements sont proposés dans une branche dédiée, sans modifier `main`. Les parties du navigateur utilisent une nouvelle clé; les anciennes clés `eco0151` et `eco015` sont conservées en lecture. Le fichier JSON exporté est le moyen de transférer une partie entre appareils. Le bouton **Retour carte** retrouve le dernier territoire remplacé par un import, un nouveau lieu ou une nouvelle carte (stockage local requis).
+
+L’ancien modèle produisait des scores différents. Les constructions sont conservées lorsque valides, mais leurs résultats sont recalculés. Les données météo anciennes sont marquées « à recharger ».
+
+Lire [l’analyse et le bilan](docs/AUDIT-2026-09-19.md) et [les hypothèses du modèle](docs/MODEL.md).
+
 ## 🧭 Prochaines priorités
 
-- déplacement réel de la caméra au doigt et à la souris ;
-- appui long pour inspecter sans construire ;
-- tests automatiques des règles métier et des sauvegardes ;
-- icônes locales totalement disponibles hors ligne ;
-- données topographiques et climatiques mieux adaptées à la planification ;
+- tests sur appareils physiques, notamment téléphone pliable;
+- modèle horaire de stockage, potabilité et réseaux d’eau;
+- données topographiques et climatiques historiques;
+- paramètres de scénario, budget et objectifs éducatifs configurables;
 - migration progressive vers TypeScript lorsque le moteur sera stabilisé.
 
 Consulter [ROADMAP.md](ROADMAP.md) pour le détail.

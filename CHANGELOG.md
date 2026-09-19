@@ -2,6 +2,31 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
+## [0.2.1-alpha] — 2026-09-19 — Fiabilité et diagnostic territorial
+
+### Corrigé
+- Unités solaires Open-Meteo et préservation des valeurs nulles au sens numérique (zéro).
+- Changements de lieu et rechargement OSM transactionnels, délais réseau bornés.
+- Nouveau nom de lieu prioritaire sur les anciennes coordonnées.
+- Validation du placement au moment de la confirmation du matériau.
+- Remplissage des polygones OSM et continuité des routes rasterisées.
+- Sauvegardes corrompues, formats inconnus et constructions incohérentes rejetés avant modification.
+- Tutoriel non bloquant, panneaux accessibles par défilement, saisie et dialogues utilisables au clavier.
+- Cache PWA isolé, jeu d’assets cohérent, icônes autonomes hors ligne.
+
+### Ajouté
+- Sauvegarde automatique avec copie précédente, point de retour avant remplacement et import/export JSON.
+- Annulation/rétablissement, inspection sans construction et raccourcis clavier.
+- Caméra déplaçable à la souris et au doigt, zoom ancré, meilleure adaptation au canevas.
+- Diagnostic des besoins, suggestions chiffrées et comparaison de trois conditions défavorables.
+- Dépendances eau/toits/habitants, bonus compost adjacent, effet d’isolation, chaleur utile limitée et capacité de batterie affichée.
+- Documentation des hypothèses, audit, points de retour Git et suite de tests métier.
+
+### Limites
+- Simulateur pédagogique quotidien; ni continuité horaire, ni potabilité, ni données géologiques validées.
+- Estimations de coût et CO₂ indicatives; performances réelles non garanties.
+- Compatibilité matérielle et installation PWA à confirmer sur appareils réels.
+
 ## [0.2.0-alpha] — 2026 — Mobile-first et PWA
 
 ### Ajouté

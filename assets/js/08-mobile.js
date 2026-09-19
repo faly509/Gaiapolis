@@ -10,39 +10,46 @@
   let deferredInstall=null;
 
   function isMobile(){return mq.matches;}
-  function clampView(v){return Math.max(.38,Math.min(1.25,v));}
+  function clampView(v){return Math.max(.18,Math.min(2.5,v));}
 
-  function applyMapScale(scale,announce=false){
-    mobileScale=isMobile()?clampView(scale):1;
-    ISO.W=baseIso.w*mobileScale;
-    ISO.H=baseIso.h*mobileScale;
+  function applyMapScale(scale,announce=false,anchor){
+    const old=mobileScale;mobileScale=clampView(scale);view.scale=mobileScale;
+    if(anchor){
+      const ratio=mobileScale/old;
+      view.x=anchor.x-CW/2-(anchor.x-CW/2-view.x)*ratio;
+      view.y=anchor.y-60-(anchor.y-60-view.y)*ratio;
+    }
+    ISO.W=baseIso.w*mobileScale;ISO.H=baseIso.h*mobileScale;
     Object.entries(BVIS).forEach(([id,v])=>{v.h=baseHeights[id]*mobileScale;});
-    resize();
-    if(announce) toast(`🔎 Zoom ${Math.round(mobileScale*100)}%`,'info');
+    if(announce)toast(`Zoom ${Math.round(mobileScale*100)} %`,'info');
   }
-
   function fitMap(){
-    if(!isMobile()){applyMapScale(1);return;}
-    const available=Math.max(280,window.innerWidth-18);
-    const scale=clampView(available/(ISO.C*baseIso.w));
-    applyMapScale(scale);
+    resize();
+    const scale=Math.min((CW-24)/(ISO.C*baseIso.w),(CH-90)/(ISO.R*baseIso.h),1.3);
+    applyMapScale(scale);view.x=0;view.y=Math.max(0,(CH-ISO.R*baseIso.h*mobileScale-80)/2);
   }
+  window.fitMap=fitMap;
 
   function closeDrawers(){
     document.querySelector('.sb:not(.sb-r)')?.classList.remove('drawer-open');
     document.querySelector('.sb-r')?.classList.remove('drawer-open');
     el('mobile-backdrop')?.classList.remove('show');
+    el('mobile-stats-btn')?.setAttribute('aria-expanded','false');el('mobile-menu-btn')?.setAttribute('aria-expanded','false');
   }
+
+  window.closeMobileDrawers=closeDrawers;
 
   function openDrawer(side){
     closeDrawers();
     const drawer=side==='stats'?document.querySelector('.sb-r'):document.querySelector('.sb:not(.sb-r)');
     drawer?.classList.add('drawer-open');
+    (side==='stats'?el('mobile-stats-btn'):el('mobile-menu-btn'))?.setAttribute('aria-expanded','true');
+    drawer?.querySelector('button,input')?.focus();
     el('mobile-backdrop')?.classList.add('show');
   }
 
   function syncMobileTools(){
-    document.querySelectorAll('.mobile-tool').forEach(b=>b.classList.toggle('on',b.dataset.t===curTool));
+    document.querySelectorAll('.mobile-tool').forEach(b=>(b.classList.toggle('on',b.dataset.t===curTool),b.setAttribute('aria-pressed',String(b.dataset.t===curTool))));
   }
 
   function buildMobileShell(){
@@ -83,8 +90,8 @@
     const controls=document.createElement('div');controls.id='mobile-map-controls';
     controls.innerHTML='<button class="map-ctl" id="map-zoom-in" aria-label="Zoom avant">+</button><button class="map-ctl" id="map-zoom-out" aria-label="Zoom arrière">−</button><button class="map-ctl" id="map-fit" aria-label="Ajuster la carte">⌂</button>';
     el('canvas-wrap').append(controls);
-    el('map-zoom-in').addEventListener('click',()=>applyMapScale(mobileScale*1.18,true));
-    el('map-zoom-out').addEventListener('click',()=>applyMapScale(mobileScale/1.18,true));
+    el('map-zoom-in').addEventListener('click',()=>applyMapScale(mobileScale*1.18,true,{x:CW/2,y:CH/2}));
+    el('map-zoom-out').addEventListener('click',()=>applyMapScale(mobileScale/1.18,true,{x:CW/2,y:CH/2}));
     el('map-fit').addEventListener('click',()=>{fitMap();toast('🗺️ Carte ajustée à l’écran','info');});
 
     const oldSetTool=setTool;
@@ -92,37 +99,52 @@
     syncMobileTools();
   }
 
-  function enableTouchTilePreview(){
-    let lastPointerTile='';
-    cvs.addEventListener('pointermove',e=>{
-      if(e.pointerType==='mouse')return;
-      const rect=cvs.getBoundingClientRect();
-      const x=e.clientX-rect.left,y=e.clientY-rect.top;
-      const {r,c}=s2g(x,y);hR=r;hC=c;
-      if(!inG(r,c)){el('tip').style.display='none';return;}
-      const key=`${r},${c}`;
-      if(key!==lastPointerTile){lastPointerTile=key;showTip(x,y,r,c);}
-    },{passive:true});
-    cvs.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse'){hR=-1;hC=-1;el('tip').style.display='none';}});
-  }
-
-  function enablePinchZoom(){
+  function enableGestures(){
     const points=new Map();
-    let pinchStart=0,startScale=1,suppressClickUntil=0;
+    let start=null,last=null,pinch=null,longTimer=null,dragged=false,suppressUntil=0;
+    const point=e=>{const rect=cvs.getBoundingClientRect();return{x:e.clientX-rect.left,y:e.clientY-rect.top};};
+    const cancelLong=()=>{clearTimeout(longTimer);longTimer=null;};
     cvs.addEventListener('pointerdown',e=>{
-      if(e.pointerType==='mouse')return;
-      points.set(e.pointerId,{x:e.clientX,y:e.clientY});
-      try{cvs.setPointerCapture(e.pointerId);}catch{}
-      if(points.size===2){const [a,b]=[...points.values()];pinchStart=Math.hypot(a.x-b.x,a.y-b.y);startScale=mobileScale;suppressClickUntil=Date.now()+700;}
+      if(e.button!==0&&e.pointerType==='mouse')return;
+      const p=point(e);points.set(e.pointerId,p);cvs.setPointerCapture(e.pointerId);
+      if(points.size===1){
+        start=last=p;dragged=false;
+        if(e.pointerType!=='mouse')longTimer=setTimeout(()=>{
+          const {r,c}=s2g(p.x,p.y);if(inG(r,c))showTip(p.x,p.y,r,c);
+          dragged=true;suppressUntil=Date.now()+800;
+        },500);
+      }else{
+        cancelLong();dragged=true;
+        const [a,b]=[...points.values()];
+        pinch={distance:Math.hypot(a.x-b.x,a.y-b.y),scale:mobileScale,center:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}};
+      }
     });
     cvs.addEventListener('pointermove',e=>{
       if(!points.has(e.pointerId))return;
-      points.set(e.pointerId,{x:e.clientX,y:e.clientY});
-      if(points.size===2&&pinchStart>0){const [a,b]=[...points.values()];const dist=Math.hypot(a.x-b.x,a.y-b.y);suppressClickUntil=Date.now()+700;applyMapScale(startScale*(dist/pinchStart));}
+      const p=point(e);points.set(e.pointerId,p);
+      if(points.size===2&&pinch){
+        const [a,b]=[...points.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+        const distance=Math.hypot(a.x-b.x,a.y-b.y);
+        applyMapScale(pinch.scale*distance/Math.max(1,pinch.distance),false,pinch.center);
+        view.x+=center.x-pinch.center.x;view.y+=center.y-pinch.center.y;
+        pinch={distance,scale:mobileScale,center};suppressUntil=Date.now()+500;
+      }else if(points.size===1&&start){
+        if(Math.hypot(p.x-start.x,p.y-start.y)>8){dragged=true;cancelLong();}
+        if(dragged){view.x+=p.x-last.x;view.y+=p.y-last.y;el('tip').style.display='none';suppressUntil=Date.now()+500;}
+        last=p;
+      }
     });
-    const end=e=>{points.delete(e.pointerId);if(points.size<2)pinchStart=0;};
+    const end=e=>{
+      cancelLong();points.delete(e.pointerId);
+      if(dragged||pinch||e.type==='pointercancel')suppressUntil=Date.now()+500;
+      pinch=null;
+      if(points.size===1){start=last=[...points.values()][0];dragged=true;}
+      else{start=last=null;}
+    };
     cvs.addEventListener('pointerup',end);cvs.addEventListener('pointercancel',end);
-    cvs.addEventListener('click',e=>{if(Date.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
+    cvs.addEventListener('click',e=>{if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
+    cvs.addEventListener('wheel',e=>{e.preventDefault();applyMapScale(mobileScale*Math.exp(-e.deltaY*.001),false,point(e));el('tip').style.display='none';},{passive:false});
+    cvs.addEventListener('contextmenu',e=>{e.preventDefault();const p=point(e),{r,c}=s2g(p.x,p.y);if(inG(r,c))showTip(p.x,p.y,r,c);});
   }
 
   function updateResponsiveMode(){
@@ -135,13 +157,13 @@
   function registerPWA(){
     window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;el('install-app')?.classList.add('visible');});
     window.addEventListener('appinstalled',()=>{deferredInstall=null;el('install-app')?.classList.remove('visible');toast('✅ Gaiapolis installé','ok');});
-    if('serviceWorker' in navigator&&location.protocol==='https:'&&location.hostname.endsWith('github.io')){
+    if('serviceWorker' in navigator&&location.protocol==='https:'&&location.hostname==='faly509.github.io'&&location.pathname.startsWith('/Gaiapolis/')){
       navigator.serviceWorker.register('./sw.js').catch(()=>{});
     }
   }
 
-  buildMobileShell();enableTouchTilePreview();enablePinchZoom();registerPWA();updateResponsiveMode();
-  setTimeout(()=>{document.querySelectorAll('.toast').forEach(t=>{if(t.textContent.includes('v0.1.5.1'))t.remove();});toast('🌍 Gaiapolis v0.2.0-alpha — interface mobile et installation PWA','info');},980);
+  buildMobileShell();enableGestures();registerPWA();updateResponsiveMode();
+
   mq.addEventListener?.('change',updateResponsiveMode);
   window.addEventListener('resize',()=>{clearTimeout(window.__gaiapolisResize);window.__gaiapolisResize=setTimeout(updateResponsiveMode,120);});
   window.addEventListener('orientationchange',()=>setTimeout(updateResponsiveMode,180));

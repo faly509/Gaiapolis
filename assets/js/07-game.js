@@ -42,7 +42,7 @@ function buildTut(){
     const cls=i<tutStep?'tn-done':i===tutStep?'tn-cur':'tn-next';
     const div=document.createElement('div');div.className='tut-row';
     div.innerHTML=`<div class="tut-num ${cls}">${i<tutStep?'✓':i+1}</div><div class="tut-txt">${s.ico} ${s.txt}</div>`;
-    el('tut-steps').appendChild(div);
+    if(i===tutStep)el('tut-steps').appendChild(div);
     const pip=document.createElement('div');pip.className='tut-pip'+(i<tutStep?' done':i===tutStep?' cur':'');
     el('tut-pips').appendChild(pip);
   });
@@ -57,7 +57,7 @@ function checkTutScore(s){
   if(tutDone||tutStep<3)return;
   if(s.eA>=50){tutDone=true;el('tut').classList.add('gone');toast('🎓 Tutoriel terminé — explore librement !','ok');}
 }
-window.skipTut=function(){el('tut').classList.add('gone');tutDone=true;};
+window.skipTut=function(){el('tut').classList.add('gone');tutDone=true;persistProject();};
 
 /* ═══ I. OPTIMIZER ══════════════════════════════════════════ */
 
@@ -80,6 +80,7 @@ function findBest(){
     })
     .sort((a,b)=>b.sc-a.sc).slice(0,5);
 
+  if(!scored.length){clearHL();toast('Aucun emplacement autorisé pour cet équipement','warn');return;}
   hl={};
   scored.forEach((b,i)=>{ hl[b.key]={col:i===0?'#48E080':'#F4BC3A', reason:b.why}; });
   const strip=el('hint');strip.classList.add('vis');
@@ -108,9 +109,10 @@ function updateAll(){
   const pill=el('h-score');if(pill){const a=s.auto;pill.textContent=`Score ${~~a}%`;pill.className='h-pill '+(a>=60?'hp-g':a>=30?'hp-a':'hp-r');}
   drawRing(s.auto);
   $t('ring-pct',~~s.auto+'%');
-  $t('score-lvl',s.auto>=80?'Expert écologique 🏆':s.auto>=60?'EcoConstructeur 🌿':s.auto>=40?'Apprenti écologique 🌱':'Construis ton premier habitat');
+  $t('score-lvl',!s.res?'Construis ton premier habitat':s.auto>=80?'Expert écologique 🏆':s.auto>=60?'EcoConstructeur 🌿':s.auto>=40?'Apprenti écologique 🌱':'Autonomie à développer');
   updateObjs(s);
   checkTutScore(s);
+  updateAdvisor(s);
 }
 function setMet(id,v,col,sub){
   const f=el('mf-'+id);if(f)f.style.width=Math.min(100,v)+'%';
@@ -135,27 +137,13 @@ function drawRing(pct){
 /* ═══ K. SAVE / RESET ═══════════════════════════════════════ */
 
 window.resetMap=function(){
-  placed={};hl={};doneSet.clear();tutStep=0;tutDone=false;
+  if(worldBusy||!checkpointCurrent())return;
+  climate={...DEFAULT_CLIMATE};terrainSeed=Math.floor(Math.random()*9999);
+  placed={};terrain=generateTerrain(ISO.C,ISO.R,terrainSeed);
   osm={loaded:false,buildings:0,roads:0,waters:0,radius:0};
-  const oi=el('osm-info');if(oi)oi.style.display='none';
-  const oc=el('osm-controls');if(oc)oc.style.display='none';
-  terrain=generateTerrain(ISO.C,ISO.R,~~(Math.random()*9999));
-  updateAll();buildObjs();buildTut();clearHL();
-  el('tut').classList.remove('gone');
-  toast('🗺️ Nouvelle carte générée !','info');
+  resetProgress();refreshLocationUI();updateAll();updateHistoryButtons();persistProject();
+  toast('Nouvelle carte — Retour carte restaure la précédente','info');
 };
-window.saveGame=function(){
-  try{localStorage.setItem('eco0151',JSON.stringify({placed,terrain,climate,osm,at:Date.now()}));toast('💾 Partie sauvegardée','ok');}
-  catch{toast('Erreur de sauvegarde','warn');}
-};
-function loadSave(){
-  try{
-    const raw=localStorage.getItem('eco0151')||localStorage.getItem('eco015');
-    if(!raw)return false;
-    const sv=JSON.parse(raw);placed=sv.placed||{};terrain=sv.terrain||{};if(sv.climate)climate=sv.climate;if(sv.osm)osm=sv.osm;
-    updateAll();showOSMInfo();return true;
-  } catch{return false;}
-}
 
 /* ═══ L. GAME LOOP & INIT ═══════════════════════════════════ */
 
@@ -164,9 +152,41 @@ function toast(msg,type='info'){
   box.appendChild(t);setTimeout(()=>t.remove(),3200);
 }
 
+function updateAdvisor(s){
+  const advice=getAdvice(s);$t('advice-title',advice.title);$t('advice-text',advice.text);
+  const choices=el('advice-choices');if(!choices)return;choices.replaceChildren();
+  for(const id of advice.ids){
+    const candidates=Object.entries(terrain).filter(([k,t])=>canPlaceBuilding(id,t,k).ok);
+    if(!candidates.length)continue;
+    const [key]=candidates.sort((a,b)=>placeSc(b[1],BLDGS[id])-placeSc(a[1],BLDGS[id]))[0];
+    const result=simulate({...placed,[key]:{id,mat:BLDGS[id].mat?curMat:null}});
+    const delta=Math.round((result.auto-s.auto)*10)/10;
+    const button=document.createElement('button');button.className='advice-option';
+    button.textContent=`${BLDGS[id].i} ${BLDGS[id].l} · ${delta>=0?'+':''}${delta} pt`;
+    button.title='Estimation à la meilleure tuile, matériau actuellement sélectionné';
+    button.addEventListener('click',()=>{setTool(id);findBest();window.closeMobileDrawers?.();});choices.append(button);
+  }
+  $t('reserve-info',s.storage?`Stockage : ${s.storage} kWh · réserve théorique pleine : ${s.reserveHours} h`:'Stockage : aucune batterie');
+  $t('water-detail',`Pluie : ${s.rainWater} L/j · eaux grises : ${s.greyWater} L/j (non potables)`);
+  $t('energy-detail',`Électricité : ${s.electric} · chaleur utile : ${s.heatUsed} kWh/j`);
+  $t('data-status',climate.source==='forecast'?`Météo : prévisions 7 jours${climate.fetchedAt?' du '+new Date(climate.fetchedAt).toLocaleDateString('fr-FR'):''} · OSM : ${osm.loaded?'chargé':'indisponible'}`:climate.source==='legacy'?'Ancien climat : recharge le lieu pour actualiser les unités':'Mode démonstration · ressources simulées');
+  if(el('scenario-panel').open)renderScenarios();
+}
+function renderScenarios(){
+  const body=el('scenario-body');body.replaceChildren();
+  for(const item of compareConditions()){
+    const tr=document.createElement('tr');
+    for(const value of [item.name,`${Math.round(item.scores.eA)} %`,`${Math.round(item.scores.wA)} %`,`${Math.round(item.scores.fA)} %`]){
+      const td=document.createElement('td');td.textContent=value;tr.append(td);
+    }
+    body.append(tr);
+  }
+}
+
 let lastT=0;
 function loop(ts){
   const dt=Math.min(ts-lastT,80);lastT=ts;
+  if(document.hidden){requestAnimationFrame(loop);return;}
   const wk=Object.keys(placed).filter(k=>placed[k].id==='wind'||placed[k].id==='hydro_t');
   const aw=wk.length?wk.reduce((s,k)=>s+(terrain[k]?.wind||.5),0)/wk.length:.5;
   windAng=(windAng+dt*(0.05+aw*.22))%360;
@@ -180,9 +200,9 @@ function init(){
   buildTools();buildLayers();buildObjs();buildTut();
   terrain=generateTerrain(ISO.C,ISO.R,42);
   if(!loadSave())updateAll();
-  resize();initAcc();
+  resize();initAcc();updateHistoryButtons();
   setTimeout(()=>{initAcc();resize();},120);
   requestAnimationFrame(loop);
-  setTimeout(()=>toast('🌍 EcoCity Engine v0.1.5.1 — Entre un lieu réel ou construis directement !','info'),900);
+  setTimeout(()=>toast('🌍 Gaiapolis — construis un territoire autonome','info'),900);
 }
 init();

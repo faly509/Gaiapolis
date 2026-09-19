@@ -26,35 +26,47 @@ Les priorités peuvent évoluer selon les tests et les contributions.
 - [x] Mode portrait utilisable et paysage optimisé
 
 ### Caméra et interactions
-- [ ] Déplacement libre de la carte au doigt et à la souris
+- [x] Déplacement libre de la carte au doigt et à la souris (v0.2.1)
 - [x] Zoom par boutons et pincement tactile
-- [ ] Appui long pour consulter une tuile sans construire
+- [x] Appui long pour consulter une tuile sans construire (v0.2.1)
 - [x] Ajustement/recentrage de la carte à l’écran
-- [ ] Zoom ancré précisément autour du geste ou du pointeur
+- [x] Zoom ancré précisément autour du geste ou du pointeur (v0.2.1)
 
 ### PWA
 - [x] `manifest.webmanifest`
 - [x] Service worker et cache des ressources locales
 - [x] Installation sur écran d’accueil quand le navigateur le permet
 - [x] Mode hors ligne partiel pour le terrain simulé après une première visite
-- [ ] Icônes et polices entièrement locales hors ligne
+- [x] Icônes et polices entièrement locales hors ligne (v0.2.1)
 
 ### Fiabilité
-- [ ] Tests automatiques de `canPlaceBuilding()`
-- [ ] Tests des scores et sauvegardes
+- [x] Tests automatiques de `canPlaceBuilding()` (v0.2.1)
+- [x] Tests des scores et sauvegardes (v0.2.1)
 - [x] Gestion explicite des conflits après rechargement OSM
 - [x] Vérifications de syntaxe dans GitHub Actions
 - [ ] Tests de rendu et d’interaction sur plusieurs tailles d’écran
 
+## ✅ v0.2.1-alpha — Fiabilité et diagnostic (proposée, non fusionnée)
+
+- [x] Caméra déplaçable, zoom ancré, inspection et appui long
+- [x] Sauvegardes validées, récupération, export/import, annulation/rétablissement
+- [x] Correction des unités météo et des valeurs zéro
+- [x] Transitions réseau conservant la partie en cas d’échec
+- [x] Diagnostic de besoins et scénarios de ressources réduites
+- [x] Dépendances élémentaires entre habitants, eau, toitures et cultures
+- [x] Tests automatisés du moteur et de la persistance
+- [x] Icônes locales, cache limité à l’application et documentation du modèle
+- [ ] Validation sur smartphones physiques et téléphone pliable
+
 ## 🌍 v0.3.0 — Données territoriales améliorées
 
 - [ ] Vraie caméra cartographique avec MapLibre ou Leaflet
-- [ ] Polygones OSM mieux rasterisés sur la grille
+- [x] Polygones OSM mieux rasterisés sur la grille (v0.2.1)
 - [ ] Relief et pente issus d’un modèle numérique de terrain
 - [ ] Données solaires historiques adaptées à la planification
 - [ ] Hydrologie et risques mieux documentés
 - [ ] Niveau de confiance visible pour chaque donnée
-- [ ] Export JSON du projet
+- [x] Export JSON du projet (v0.2.1)
 - [ ] Partage d’une ville par URL
 
 ## 🏗️ v0.4.0 — Simulation de l’habitat
