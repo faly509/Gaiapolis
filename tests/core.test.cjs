@@ -121,3 +121,20 @@ test('failed OSM refresh is transactional',async()=>{
   const c=core();flat(c);c.run(`climate.lat=0;climate.lon=0;terrain['0,0'].terrainType='road';fetchJSON=async()=>{throw Error('offline')};`);
   const before=c.run('JSON.stringify(terrain)');await c.run('window.reloadOSM()');assert.equal(c.run('JSON.stringify(terrain)'),before);
 });
+
+test('new town resolves fresh coordinates, commits only once, and checkpoints previous city',async()=>{
+  const c=core();flat(c);c.run(`placed['0,0']={id:'simple_house',mat:'wood'};climate.lat=48;climate.lon=2;
+    fetchJSON=async url=>url.includes('nominatim')?[{lat:'43.61',lon:'3.88',display_name:'Montpellier, France'}]:url.includes('open-meteo')?{daily:{shortwave_radiation_sum:[18],wind_speed_10m_max:[10],precipitation_sum:[0],temperature_2m_max:[24],temperature_2m_min:[16]}}:{elements:[]};`);
+  c.element('loc-name').value='Montpellier';c.element('loc-lat').value='48';c.element('loc-lon').value='2';
+  await c.run('window.loadRealLocation()');assert.equal(c.run('climate.lat'),43.61);assert.equal(c.run('climate.lon'),3.88);
+  assert.equal(c.run('Object.keys(placed).length'),0);assert.equal(c.run('climate.precip'),0);
+  assert.equal(JSON.parse(c.storage.get('gaiapolis:checkpoint:v3')).placed['0,0'].id,'simple_house');
+});
+test('concurrent load is ignored while a world transition is pending',async()=>{
+  const c=core();c.run(`worldBusy=true;fetchJSON=async()=>{throw Error('must not run')};`);
+  const before=c.run('JSON.stringify(terrain)');await c.run('window.loadRealLocation()');assert.equal(c.run('JSON.stringify(terrain)'),before);
+});
+test('saved unfinished tutorial retains its explicit progress',()=>{
+  const c=core();flat(c);c.run(`placed['1,1']={id:'simple_house',mat:'wood'};tutStep=1;tutDone=false;`);
+  const p=c.run('validateProject(copy(projectSnapshot()))');assert.equal(p.tutorial.done,false);assert.equal(p.tutorial.step,1);
+});

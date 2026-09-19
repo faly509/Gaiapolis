@@ -133,7 +133,7 @@ function doPlace(key,bid,mat){
     if(d.oFlo>.01&&(t.hydrologicalFlow||0)>.42)       why.push('🌊 bon débit');
     if(d.oGeo>.01&&(t.geothermalPotential||0)>.62)    why.push('🌋 géothermie forte');
     if(d.c===CAT.F&&t.fertility>.62)                  why.push('🌱 sol fertile');
-    toast(`✨ Emplacement optimal ! ${why.slice(0,2).join(' · ')}`,'ok');
+    toast(`✨ Emplacement favorable (${Math.round(sc)}/100)${why.length?' · '+why.slice(0,2).join(' · '):''}`,'ok');
   } else if(sc<28){
     flashEffect(key,'bd');
     const warn=[];

@@ -6,6 +6,7 @@ let osmVisible=true;
 window.toggleOSMVisible=function(){
   osmVisible=!osmVisible;
   el('ltog-osm')?.classList.toggle('on',osmVisible);
+  persistProject();
   toast(osmVisible?'🗺️ Données OSM affichées':'🗺️ Données OSM masquées (règles toujours actives)','info');
 };
 
@@ -156,7 +157,7 @@ window.loadRealLocation=async function(){
     let nextOSM={loaded:false,buildings:0,roads:0,waters:0,radius:0};
     try{locSt('Carte OpenStreetMap…',true);nextOSM=applyOSMToTerrain(await fetchOSM(lat,lon,500),lat,lon,500,nextTerrain);}
     catch{toast('OSM indisponible : relief simulé avec la météo du lieu','info');}
-    if(!checkpointCurrent())return;
+    if(!checkpointCurrent()){locSt('Chargement annulé — exporte la partie',false);return;}
     climate=nextClimate;terrain=nextTerrain;terrainSeed=seed;osm=nextOSM;placed={};
     resetProgress();refreshLocationUI();updateAll();persistProject();
     locSt('Lieu chargé ✓',false);toast(`🗺️ ${climate.name} — météo à court terme`,'ok');
