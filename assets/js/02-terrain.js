@@ -2,13 +2,14 @@
 
 const ISO={W:50,H:25,C:18,R:18};
 let CW=800,CH=560;
-let terrain={},placed={};
-let climate={sun:.55,wind:.45,rain:.50,temp:15,radiation:4.4,windMax:18,precip:2.5,name:'',lat:null,lon:null,biome:'Tempéré'};
+let terrain={},placed={},terrainSeed=42;
+const DEFAULT_CLIMATE={sun:.55,wind:.45,rain:.50,temp:15,radiation:4.4,windMax:18,precip:2.5,name:'',lat:null,lon:null,biome:'Tempéré',source:'simulated'};
+let climate={...DEFAULT_CLIMATE};
 const clamp=(v,lo=0,hi=1)=>Math.min(hi,Math.max(lo,v));
 const nx=(x,y,f,p=0)=>Math.sin(x*f+p)*.3+Math.cos(y*f*1.3+p*.7)*.2;
 
-function generateTerrain(cols,rows,seed=42){
-  const g={},s=seed*.01,{sun:cS,wind:cW,rain:cR,temp:cT}=climate;
+function generateTerrain(cols,rows,seed=42,weather=climate){
+  const g={},s=seed*.01,{sun:cS,wind:cW,rain:cR,temp:cT}=weather;
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
     const cx=c/cols,cy=r/rows;
     const alt=clamp(.5+nx(cx,cy,5.1+s,2.1)+nx(cx,cy,2.2,.9));
@@ -29,28 +30,36 @@ function generateTerrain(cols,rows,seed=42){
 }
 
 async function geocodeName(name){
-  const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,{headers:{'Accept-Language':'fr'}});
-  if(!r.ok)throw new Error('Nominatim inaccessible');
-  const d=await r.json();
+  const d=await fetchJSON(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,{headers:{'Accept-Language':'fr'}});
   if(!d.length)throw new Error('Lieu introuvable — essaie un nom plus précis');
   return{lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon),name:d[0].display_name.split(',')[0]};
 }
 
 async function fetchClimate(lat,lon){
   const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,cloud_cover&daily=shortwave_radiation_sum,wind_speed_10m_max,precipitation_sum,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=7`;
-  const r=await fetch(url);if(!r.ok)throw new Error('Open-Meteo inaccessible');
-  const d=await r.json(),avg=a=>a&&a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
-  const radiation=avg(d.daily.shortwave_radiation_sum)||3.5,windMax=avg(d.daily.wind_speed_10m_max)||15,precip=avg(d.daily.precipitation_sum)||2;
-  const temp=((avg(d.daily.temperature_2m_max)||20)+(avg(d.daily.temperature_2m_min)||10))/2;
-  return{sun:clamp(radiation/8),wind:clamp(windMax/40),rain:clamp(precip/8),temp,radiation,windMax,precip,biome:classifyBiome(temp,clamp(precip/8))};
+  return climateFromForecast(await fetchJSON(url));
+}
+function climateFromForecast(d){
+  const avg=a=>{
+    const values=Array.isArray(a)?a.filter(Number.isFinite):[];
+    if(!values.length)throw new Error('Prévisions météo incomplètes');
+    return values.reduce((x,y)=>x+y,0)/values.length;
+  };
+  // Open-Meteo returns daily solar radiation in MJ/m²; 1 kWh = 3.6 MJ.
+  const radiation=avg(d.daily?.shortwave_radiation_sum)/3.6;
+  const windMax=avg(d.daily?.wind_speed_10m_max),precip=avg(d.daily?.precipitation_sum);
+  const temp=(avg(d.daily?.temperature_2m_max)+avg(d.daily?.temperature_2m_min))/2;
+  if(radiation<0||windMax<0||precip<0)throw new Error('Prévisions météo invalides');
+  return{sun:clamp(radiation/8),wind:clamp(windMax/40),rain:clamp(precip/8),temp,radiation,windMax,precip,
+    biome:classifyBiome(temp,clamp(precip/8)),source:'forecast',fetchedAt:Date.now(),period:d.daily.time?.slice(0,7)||[]};
 }
 function classifyBiome(temp,rain){
-  if(temp>24&&rain>.7)return'Tropical humide 🌴';
-  if(temp>20&&rain<.3)return'Aride / désertique 🏜️';
-  if(temp>16&&rain>.4)return'Méditerranéen ☀️';
-  if(temp>10&&rain>.5)return'Tempéré océanique ☁️';
-  if(temp>8)return'Tempéré continental 🍂';
-  if(temp>0)return'Subarctique 🏔️';
-  return'Polaire ❄️';
+  if(temp>24&&rain>.7)return'Chaud et pluvieux';
+  if(temp>20&&rain<.3)return'Chaud et sec';
+  if(temp>16&&rain>.4)return'Doux avec pluie';
+  if(temp>10&&rain>.5)return'Frais et pluvieux';
+  if(temp>8)return'Tempéré';
+  if(temp>0)return'Froid';
+  return'Gel';
 }
 function hashStr(s){let h=5381;for(let i=0;i<s.length;i++)h=(h*33^s.charCodeAt(i))>>>0;return h;}

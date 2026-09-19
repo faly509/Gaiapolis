@@ -1,0 +1,16 @@
+/* Local interface glyphs; no external font required. */
+.ti{font-style:normal;display:inline-block;line-height:1.1}
+.ti-hammer::before{content:"⚒"}
+.ti-map-pin::before{content:"⌖"}
+.ti-download::before{content:"↓"}
+.ti-upload::before{content:"↑"}
+.ti-refresh::before{content:"↻"}
+.ti-current-location::before{content:"⊙"}
+.ti-loader::before{content:"◌"}
+.ti-check::before{content:"✓"}
+.ti-layers-intersect::before{content:"▱"}
+.ti-chevron-down::before{content:"⌄"}
+.ti-crosshair::before{content:"⊕"}
+.ti-device-floppy::before{content:"▣"}
+.ti-bulb::before{content:"◉"}
+.ti-trophy::before{content:"♜"}

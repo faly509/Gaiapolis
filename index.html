@@ -1,5 +1,5 @@
 <!--
-Gaiapolis / EcoCity Engine v0.1.5.1
+Gaiapolis / EcoCity Engine v0.2.1-alpha
 Author: Norbert Randriamaitso <norbert.randri@gmail.com>
 License: MIT
 Status: early public prototype — educational estimates, not engineering advice.
@@ -9,35 +9,44 @@ Data: Open-Meteo, Nominatim/OpenStreetMap, Overpass API.
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Gaiapolis — EcoCity Engine v0.1.5.1</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="description" content="Gaiapolis, simulateur open-source de territoires écologiques et d'habitats autonomes.">
+<meta name="theme-color" content="#151C10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Gaiapolis — EcoCity Engine v0.2.1-alpha</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/icons.css">
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/game.css">
+<link rel="stylesheet" href="assets/css/mobile.css">
+<link rel="stylesheet" href="assets/css/experience.css">
 </head>
 <body>
 <header id="hdr">
-  <span class="h-logo">🌍</span><span class="h-title">Gaiapolis</span><span class="h-ver">v0.1.5.1</span>
+  <span class="h-logo">🌍</span><span class="h-title">Gaiapolis</span><span class="h-ver">v0.2.1α</span>
   <span class="h-loc" id="h-loc">Terrain simulé</span><div class="h-sep"></div>
   <span class="h-tool">Outil :</span><span id="h-toolname">Maison simple</span><span class="h-pill hp-r" id="h-score">Score 0%</span>
 </header>
 <div id="app">
-<aside class="sb">
+<aside class="sb" aria-label="Outils et projet">
+  <div class="project-actions"><div class="section-title">MON TERRITOIRE</div><div class="action-grid"><button id="undo-btn" onclick="undoEdit()" disabled title="Ctrl+Z">↶ Annuler</button><button id="redo-btn" onclick="redoEdit()" disabled>↷ Rétablir</button><button onclick="exportProject()">↑ Exporter</button><button onclick="document.getElementById('import-file').click()">↓ Importer</button><button onclick="restoreCheckpoint()">↩ Retour carte</button><button id="inspect-btn" onclick="toggleInspect()" aria-pressed="false">⌕ Inspecter</button></div><input id="import-file" type="file" accept=".json,application/json" hidden onchange="importProject(this.files[0])"><p id="save-status" role="status">Sauvegarde automatique</p></div>
   <div class="acc-h open" id="ah-tools" onclick="acc('tools')"><i class="ti ti-hammer"></i>Bâtiments<span class="arrow"><i class="ti ti-chevron-down"></i></span></div>
   <div class="acc-b" id="ab-tools"><div id="tool-grid"></div></div>
   <div class="acc-h open" id="ah-loc" onclick="acc('loc')"><i class="ti ti-map-pin"></i>Lieu réel<span class="arrow"><i class="ti ti-chevron-down"></i></span></div>
   <div class="acc-b" id="ab-loc"><div class="loc-wrap">
-    <input class="inp" id="loc-name" placeholder="Nom du lieu (ex : Montpellier)" type="text">
-    <div class="loc-row"><input class="inp inp-sm" id="loc-lat" placeholder="Lat." type="number" step="0.001"><input class="inp inp-sm" id="loc-lon" placeholder="Lon." type="number" step="0.001"><button class="lbtn lb-sec" onclick="geolocate()" title="Ma position"><i class="ti ti-current-location"></i></button></div>
-    <div class="loc-row"><button class="lbtn lb-ok" style="flex:1" onclick="loadRealLocation()"><i class="ti ti-download"></i> Charger</button><button class="lbtn lb-sec" onclick="resetMap()"><i class="ti ti-refresh"></i></button></div>
-    <div id="loc-st"><i class="ti ti-loader spin" id="loc-ico"></i><span id="loc-msg">Chargement…</span></div>
+    <input class="inp" id="loc-name" aria-label="Nom du lieu" placeholder="Nom du lieu (ex : Montpellier)" type="text">
+    <div class="loc-row"><input class="inp inp-sm" id="loc-lat" aria-label="Latitude" min="-90" max="90" placeholder="Lat." type="number" step="0.001"><input class="inp inp-sm" id="loc-lon" aria-label="Longitude" min="-180" max="180" placeholder="Lon." type="number" step="0.001"><button class="lbtn lb-sec" onclick="geolocate()" title="Ma position" aria-label="Utiliser ma position"><i class="ti ti-current-location"></i></button></div>
+    <div class="loc-row"><button class="lbtn lb-ok" style="flex:1" onclick="loadRealLocation()"><i class="ti ti-download"></i> Charger</button><button class="lbtn lb-sec" onclick="resetMap()" title="Nouvelle carte simulée" aria-label="Nouvelle carte simulée"><i class="ti ti-refresh"></i></button></div>
+    <div id="loc-st" role="status"><i class="ti ti-loader spin" id="loc-ico"></i><span id="loc-msg">Chargement…</span></div>
     <div id="loc-card">
       <div class="lc-row"><span>📍 Lieu</span><b id="lc-name">—</b></div><div class="lc-row"><span>🌐 Coords</span><b id="lc-coords">—</b></div><div class="lc-row"><span>🌿 Biome</span><b id="lc-biome">—</b></div><div class="lc-row"><span>🌡️ Temp.</span><b id="lc-temp">—</b></div><div class="lc-row"><span>☀️ Rayonnement</span><b id="lc-rad">—</b></div><div class="lc-row"><span>💨 Vent</span><b id="lc-wind">—</b></div><div class="lc-row"><span>🌧️ Pluie</span><b id="lc-rain">—</b></div>
       <div class="lc-mini" id="lc-bars"></div>
       <div id="osm-info" style="display:none;margin-top:6px;padding:6px 8px;background:var(--blb);border:1px solid var(--bld);border-radius:var(--r1);font-size:10px;color:var(--bl)"></div>
       <div id="osm-controls" style="display:none;margin-top:6px;flex-direction:column;gap:5px"><div class="lyr-row" style="padding:4px 0" onclick="toggleOSMVisible()"><div class="ldot" style="background:#5A6478"></div><span>Afficher données OSM</span><div class="ltog on" id="ltog-osm"></div></div><button class="lbtn lb-sec" onclick="reloadOSM()"><i class="ti ti-refresh"></i> Recharger secteur réel</button></div>
       <div id="loc-disc">⚠️ <b>Simulation simplifiée</b> — les objets OSM sont projetés approximativement sur la grille. Usage éducatif uniquement.</div>
-      <div id="loc-src">Sources : Open-Meteo · Nominatim / OpenStreetMap · Overpass</div>
+      <div id="loc-src">Sources : <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> (ODbL) · Overpass</div>
     </div>
   </div></div>
   <div class="acc-h" id="ah-lyr" onclick="acc('lyr')"><i class="ti ti-layers-intersect"></i>Couches<span class="arrow"><i class="ti ti-chevron-down"></i></span></div>
@@ -46,25 +55,29 @@ Data: Open-Meteo, Nominatim/OpenStreetMap, Overpass API.
 </aside>
 <main id="canvas-wrap">
   <div id="hud"><i class="ti ti-map-pin"></i><span id="hud-coord">Survole une tuile pour voir ses ressources</span><span class="hud-stat">👥<b id="h-res">0</b></span><span class="hud-stat">🏗️<b id="h-cnt">0</b></span><span class="hud-stat">💰<b id="h-cost">0 €</b></span></div>
-  <canvas id="main-canvas"></canvas><div id="flash"></div><canvas id="spc"></canvas><div id="tip"></div>
-  <div id="hint"><i class="ti ti-bulb"></i><span id="hint-txt">Meilleurs emplacements</span><button id="hint-close" onclick="clearHL()">✕</button></div><div id="toasts"></div>
+  <canvas id="main-canvas" tabindex="0" aria-label="Carte du territoire : choisir un bâtiment puis cliquer; glisser pour déplacer et molette pour zoomer"></canvas><div id="flash"></div><canvas id="spc"></canvas><div id="tip"></div>
+  <div id="hint"><i class="ti ti-bulb"></i><span id="hint-txt">Meilleurs emplacements</span><button id="hint-close" onclick="clearHL()">✕</button></div><div id="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
   <div id="tut"><div id="tut-box"><button id="tut-skip" onclick="skipTut()">Passer</button><div id="tut-steps"></div><div class="tut-pips" id="tut-pips"></div></div></div>
   <div id="reward"><div class="rw"><span class="rw-e" id="rw-e">🎉</span><div class="rw-t" id="rw-t">Objectif atteint !</div><div class="rw-s" id="rw-s"></div></div></div>
 </main>
-<aside class="sb sb-r"><div class="sb-scroll">
-  <div id="score-area"><div id="ring-wrap"><canvas id="ring" width="58" height="58"></canvas><div id="ring-pct">0%</div></div><div><div id="score-label">Score d’autonomie</div><div id="score-lvl">Construis ton premier habitat</div></div></div>
-  <div class="kpi-g"><div class="kpi"><div class="kpi-l">Énergie nette</div><div class="kpi-v" id="kpi-enet">+0</div><div class="kpi-u">kWh/jour</div></div><div class="kpi"><div class="kpi-l">Résidents</div><div class="kpi-v" id="kpi-res">0</div><div class="kpi-u">habitants</div></div><div class="kpi"><div class="kpi-l">CO₂ bâti</div><div class="kpi-v" id="kpi-co2">0 kg</div></div><div class="kpi"><div class="kpi-l">Entretien</div><div class="kpi-v" id="kpi-maint">0</div><div class="kpi-u">€/an</div></div></div>
+<aside class="sb sb-r" aria-label="Diagnostic du territoire"><div class="sb-scroll">
+  <section class="advisor"><div class="section-title">PROCHAINE ÉTAPE</div><h2 id="advice-title"></h2><p id="advice-text"></p><div id="advice-choices"></div><small>Gain estimé sur le score global. Compare avant de construire.</small></section>
+  <div id="score-area"><div id="ring-wrap"><canvas id="ring" width="58" height="58"></canvas><div id="ring-pct">0%</div></div><div><div id="score-label">Score global estimé</div><div id="score-lvl">Construis ton premier habitat</div></div></div>
+  <div class="kpi-g"><div class="kpi"><div class="kpi-l">Énergie disponible</div><div class="kpi-v" id="kpi-enet">+0</div><div class="kpi-u">kWh/jour</div></div><div class="kpi"><div class="kpi-l">Résidents</div><div class="kpi-v" id="kpi-res">0</div><div class="kpi-u">habitants</div></div><div class="kpi"><div class="kpi-l">CO₂ matériau*</div><div class="kpi-v" id="kpi-co2">0 kg</div></div><div class="kpi"><div class="kpi-l">Entretien</div><div class="kpi-v" id="kpi-maint">0</div><div class="kpi-u">€/an</div></div></div>
   <div class="met"><div class="met-hd">⚡ Énergie <span id="mv-e">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-e" style="background:var(--am)"></div></div><div class="met-sub" id="ms-e"></div></div>
   <div class="met"><div class="met-hd">💧 Eau <span id="mv-w">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-w" style="background:var(--bl)"></div></div><div class="met-sub" id="ms-w"></div></div>
   <div class="met"><div class="met-hd">🌱 Nourriture <span id="mv-f">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-f" style="background:var(--gn)"></div></div><div class="met-sub" id="ms-f"></div></div>
+  <div class="balance-notes"><p id="energy-detail"></p><p id="water-detail"></p><p id="reserve-info"></p><small>Couverture journalière théorique. Potabilité et continuité horaire non simulées.</small></div>
   <div class="met"><div class="met-hd">🌍 Écologie <span id="mv-eco">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-eco" style="background:var(--gn)"></div></div></div>
   <div class="met"><div class="met-hd">🏗️ Solidité <span id="mv-str">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-str" style="background:var(--ea)"></div></div></div>
   <div class="met"><div class="met-hd">😊 Confort <span id="mv-cf">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-cf" style="background:var(--pu)"></div></div></div>
+  <details id="scenario-panel" ontoggle="if(this.open)renderScenarios()"><summary>☀ Tester la résilience</summary><p>Même territoire, ressources réduites. Ces scénarios sont des hypothèses de jeu.</p><table><thead><tr><th>Conditions</th><th>Énergie</th><th>Eau</th><th>Alim.</th></tr></thead><tbody id="scenario-body"></tbody></table></details>
+  <div class="data-card"><p id="data-status"></p><p>Relief, débit, sol et géothermie : simulés. Scores éducatifs, sans validation de terrain.</p><small>* Indice illustratif : 800 kg de matériau par bâtiment. Ce n’est pas une analyse de cycle de vie.</small></div>
   <button class="opt-btn" onclick="findBest()"><i class="ti ti-crosshair"></i> Trouver les meilleurs emplacements</button>
   <div class="acc-h open" id="ah-obj" onclick="acc('obj')"><i class="ti ti-trophy"></i>Objectifs<span class="arrow"><i class="ti ti-chevron-down"></i></span></div><div class="acc-b" id="ab-obj"><div class="obj-list" id="obj-list"></div></div>
 </div></aside>
 </div>
-<div id="mat-dlg"><div id="mat-box"><h2>🧱 Choisir le matériau</h2><div id="mat-sub"></div><div class="mat-g" id="mat-g"></div><div class="mat-prev" id="mat-prev"></div><div class="dlg-btns"><button class="dbtn dno" onclick="closeMat(false)">Annuler</button><button class="dbtn dok" onclick="closeMat(true)">Construire →</button></div></div></div>
-<script src="assets/js/00-core.js"></script><script src="assets/js/01-data.js"></script><script src="assets/js/02-terrain.js"></script><script src="assets/js/03-osm.js"></script><script src="assets/js/04-simulation.js"></script><script src="assets/js/05-renderer.js"></script><script src="assets/js/06-ui.js"></script><script src="assets/js/07-game.js"></script>
+<div id="mat-dlg" role="dialog" aria-modal="true" aria-labelledby="mat-title"><div id="mat-box"><h2 id="mat-title">🧱 Choisir le matériau</h2><div id="mat-sub"></div><div class="mat-g" id="mat-g"></div><div class="mat-prev" id="mat-prev"></div><div class="dlg-btns"><button class="dbtn dno" onclick="closeMat(false)">Annuler</button><button class="dbtn dok" onclick="closeMat(true)">Construire →</button></div></div></div>
+<script src="assets/js/00-core.js"></script><script src="assets/js/01-data.js"></script><script src="assets/js/02-terrain.js"></script><script src="assets/js/03-osm.js"></script><script src="assets/js/04-simulation.js"></script><script src="assets/js/05-renderer.js"></script><script src="assets/js/06-ui.js"></script><script src="assets/js/06-storage.js"></script><script src="assets/js/07-game.js"></script><script src="assets/js/08-mobile.js"></script>
 </body>
 </html>

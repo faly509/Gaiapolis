@@ -25,15 +25,26 @@ const cvs = el('main-canvas'), ctx = cvs.getContext('2d');
 const spc = el('spc'), sCtx = spc.getContext('2d');
 let parts=[], windAng=0, wPh=0, gPh=0, hl={};
 
-function resize() {
-  const r=el('canvas-wrap').getBoundingClientRect();
-  cvs.width=spc.width=r.width; cvs.height=spc.height=r.height-33;
-  CW=cvs.width; CH=cvs.height;
+const view={x:0,y:0,scale:1};
+function resize(){
+  const wrap=el('canvas-wrap'),rect=wrap.getBoundingClientRect();
+  const reserved=parseFloat(getComputedStyle(wrap).paddingBottom)||0;
+  CW=Math.max(1,rect.width);CH=Math.max(1,rect.height-el('hud').offsetHeight-reserved);
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  spc.style.top=el('hud').offsetHeight+'px';
+  for(const [canvas,context] of [[cvs,ctx],[spc,sCtx]]){
+    canvas.width=Math.round(CW*dpr);canvas.height=Math.round(CH*dpr);
+    canvas.style.width=CW+'px';canvas.style.height=CH+'px';
+    context.setTransform(dpr,0,0,dpr,0,0);
+  }
 }
 new ResizeObserver(resize).observe(el('canvas-wrap'));
 
-const iXY = (r,c) => ({ x:CW/2+(c-r)*(ISO.W/2), y:80+(c+r)*(ISO.H/2) });
-function s2g(mx,my){ const ox=CW/2,oy=80,dx=mx-ox,dy=my-oy,W2=ISO.W/2,H2=ISO.H/2; return{r:~~((dy/H2-dx/W2)/2+.5),c:~~((dy/H2+dx/W2)/2+.5)}; }
+const iXY=(r,c)=>({x:CW/2+view.x+(c-r)*ISO.W/2,y:60+view.y+(c+r)*ISO.H/2});
+function s2g(mx,my){
+  const dx=mx-CW/2-view.x,dy=my-60-view.y;
+  return{r:Math.floor((dy/(ISO.H/2)-dx/(ISO.W/2))/2+.5),c:Math.floor((dy/(ISO.H/2)+dx/(ISO.W/2))/2+.5)};
+}
 const inG = (r,c) => r>=0&&r<ISO.R&&c>=0&&c<ISO.C;
 
 function lrp(hex,t){ const v=parseInt(hex.replace('#','').padStart(6,'8'),16); return`rgb(${~~(((v>>16)&255)+(255-((v>>16)&255))*t)},${~~(((v>>8)&255)+(255-((v>>8)&255))*t)},${~~((v&255)+(255-(v&255))*t)})`; }
@@ -41,11 +52,10 @@ function rgba(hex,a){ const v=parseInt(hex.replace('#','').padStart(6,'8'),16); 
 function blend(h1,h2,t){ const p=s=>parseInt(s.replace('#','').padStart(6,'0'),16),v1=p(h1),v2=p(h2),ch=(a,b)=>~~(a+(b-a)*t); return`rgb(${ch((v1>>16)&255,(v2>>16)&255)},${ch((v1>>8)&255,(v2>>8)&255)},${ch(v1&255,v2&255)})`; }
 function poly(pts,col){ ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.14)';ctx.lineWidth=.5;ctx.stroke(); }
 
+const drawOrder=Array.from({length:ISO.R*ISO.C},(_,i)=>[Math.floor(i/ISO.C),i%ISO.C]).sort(([r1,c1],[r2,c2])=>(r1+c1)-(r2+c2));
 function drawFrame() {
   ctx.clearRect(0,0,CW,CH);
-  const order=[];for(let r=0;r<ISO.R;r++)for(let c=0;c<ISO.C;c++)order.push([r,c]);
-  order.sort(([r1,c1],[r2,c2])=>(r1+c1)-(r2+c2));
-  for(const[r,c]of order){
+  for(const[r,c]of drawOrder){
     const key=`${r},${c}`, t=terrain[key]||{};
     drawTile(r,c,t, r===hR&&c===hC, hl[key]);
     if(osmVisible&&t.terrainType==='existing_building') drawExistingBld(r,c);
@@ -68,7 +78,7 @@ function tileBase(t){
 }
 
 function drawExistingBld(r,c){
-  const {x,y}=iXY(r,c),W=ISO.W/2,H=ISO.H/2,bh=16;
+  const {x,y}=iXY(r,c),W=ISO.W/2,H=ISO.H/2,bh=16*view.scale;
   const pts={t:{x,y:y-H-bh},tr:{x:x+W,y:y-bh},tb:{x,y:y+H-bh},tl:{x:x-W,y:y-bh},br:{x:x+W,y},bb:{x,y:y+H},bl:{x:x-W,y}};
   poly([pts.t,pts.tr,pts.tb,pts.tl],'#5A6478');
   poly([pts.tr,pts.br,pts.bb,pts.tb],'#3A4250');
@@ -95,7 +105,7 @@ function drawTile(r,c,t,hover,h){
     ctx.fillStyle=rgba(h.col,hA); ctx.fill();
     ctx.strokeStyle=rgba(h.col,1); ctx.lineWidth=2.5; ctx.stroke();
   }
-  if(hover&&curTool&&curTool!=='__erase__'){
+  if(hover&&!inspectMode&&curTool&&curTool!=='__erase__'){
     const d=BLDGS[curTool]; if(!d) return;
     const chk=canPlaceBuilding(curTool,t,`${hR},${hC}`);
     ctx.beginPath();ctx.moveTo(x,y-H);ctx.lineTo(x+W,y);ctx.lineTo(x,y+H);ctx.lineTo(x-W,y);ctx.closePath();
@@ -244,7 +254,7 @@ function showTip(mx,my,r,c){
     </div>
     <div class="tip-tags">${tileRecs(t).map(g=>`<span class="tag ${g.c}">${g.v}</span>`).join('')}</div>${extra}`;
   const rect=cvs.getBoundingClientRect();
-  tip.style.left=Math.min(mx+16,rect.width-272)+'px';
+  tip.style.left=Math.max(4,Math.min(mx+16,rect.width-272))+'px';
   tip.style.top =Math.max(4,Math.min(my-10,CH-220))+'px';
   tip.style.display='block';
 }

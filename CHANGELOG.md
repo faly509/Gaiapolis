@@ -2,6 +2,54 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
+## [0.2.1-alpha] — 2026-09-19 — Fiabilité et diagnostic territorial
+
+### Corrigé
+- Unités solaires Open-Meteo et préservation des valeurs nulles au sens numérique (zéro).
+- Changements de lieu et rechargement OSM transactionnels, délais réseau bornés.
+- Nouveau nom de lieu prioritaire sur les anciennes coordonnées.
+- Validation du placement au moment de la confirmation du matériau.
+- Remplissage des polygones OSM et continuité des routes rasterisées.
+- Sauvegardes corrompues, formats inconnus et constructions incohérentes rejetés avant modification.
+- Tutoriel non bloquant, panneaux accessibles par défilement, saisie et dialogues utilisables au clavier.
+- Cache PWA isolé, jeu d’assets cohérent, icônes autonomes hors ligne.
+
+### Ajouté
+- Sauvegarde automatique avec copie précédente, point de retour avant remplacement et import/export JSON.
+- Annulation/rétablissement, inspection sans construction et raccourcis clavier.
+- Caméra déplaçable à la souris et au doigt, zoom ancré, meilleure adaptation au canevas.
+- Diagnostic des besoins, suggestions chiffrées et comparaison de trois conditions défavorables.
+- Dépendances eau/toits/habitants, bonus compost adjacent, effet d’isolation, chaleur utile limitée et capacité de batterie affichée.
+- Documentation des hypothèses, audit, points de retour Git et suite de tests métier.
+
+### Limites
+- Simulateur pédagogique quotidien; ni continuité horaire, ni potabilité, ni données géologiques validées.
+- Estimations de coût et CO₂ indicatives; performances réelles non garanties.
+- Compatibilité matérielle et installation PWA à confirmer sur appareils réels.
+
+## [0.2.0-alpha] — 2026 — Mobile-first et PWA
+
+### Ajouté
+- Interface smartphone avec carte prioritaire en plein écran.
+- Barre de construction tactile et défilable en bas de l’écran.
+- Panneaux coulissants pour les outils et le tableau de bord.
+- Boutons de zoom, ajustement automatique de la carte et pincement à deux doigts.
+- Fiche de tuile adaptée au tactile.
+- Prise en charge des zones sûres et des orientations portrait/paysage.
+- `manifest.webmanifest`, icône d’application et installation PWA.
+- Service worker mettant en cache les ressources locales pour un usage hors ligne partiel.
+- Workflow GitHub Actions vérifiant JavaScript, manifeste et références de fichiers.
+
+### Modifié
+- Version affichée `v0.2.0-alpha`.
+- Taille de la grille et des bâtiments ajustée dynamiquement à la largeur du smartphone.
+- Documentation mise à jour pour distinguer le mode hors ligne simulé des données réelles nécessitant Internet.
+
+### Limites connues
+- La caméra ne se déplace pas encore librement au doigt ou à la souris.
+- Le pincement zoome autour du centre de la carte, sans point d’ancrage précis.
+- Les icônes Tabler externes peuvent manquer hors ligne, sans bloquer les fonctions principales.
+
 ## [0.1.5.1] — 2026 — Stabilisation OSM
 
 ### Corrigé
