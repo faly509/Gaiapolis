@@ -1,6 +1,6 @@
 'use strict';
 
-/* Gaiapolis v0.2.0-alpha — mobile controls, responsive map and PWA bootstrap */
+/* Gaiapolis v0.2.1-alpha — mobile controls, responsive map and PWA bootstrap */
 (() => {
   const MOBILE_QUERY='(max-width: 900px)';
   const mq=window.matchMedia(MOBILE_QUERY);
@@ -31,10 +31,14 @@
   window.fitMap=fitMap;
 
   function closeDrawers(){
+    const active=document.activeElement;
+    if(isMobile()&&active?.closest('.sb'))el('mobile-menu-btn')?.focus({preventScroll:true});
+    document.querySelectorAll('.sb').forEach(drawer=>{drawer.inert=isMobile();drawer.setAttribute('aria-hidden',String(isMobile()));});
     document.querySelector('.sb:not(.sb-r)')?.classList.remove('drawer-open');
     document.querySelector('.sb-r')?.classList.remove('drawer-open');
     el('mobile-backdrop')?.classList.remove('show');
     el('mobile-stats-btn')?.setAttribute('aria-expanded','false');el('mobile-menu-btn')?.setAttribute('aria-expanded','false');
+    el('app').scrollLeft=0;
   }
 
   window.closeMobileDrawers=closeDrawers;
@@ -42,9 +46,9 @@
   function openDrawer(side){
     closeDrawers();
     const drawer=side==='stats'?document.querySelector('.sb-r'):document.querySelector('.sb:not(.sb-r)');
-    drawer?.classList.add('drawer-open');
+    if(drawer){drawer.inert=false;drawer.setAttribute('aria-hidden','false');drawer.classList.add('drawer-open');}
     (side==='stats'?el('mobile-stats-btn'):el('mobile-menu-btn'))?.setAttribute('aria-expanded','true');
-    drawer?.querySelector('button,input')?.focus();
+    drawer?.querySelector('button:not(:disabled),input')?.focus({preventScroll:true});
     el('mobile-backdrop')?.classList.add('show');
   }
 
@@ -95,7 +99,7 @@
     el('map-fit').addEventListener('click',()=>{fitMap();toast('🗺️ Carte ajustée à l’écran','info');});
 
     const oldSetTool=setTool;
-    window.setTool=function(id){oldSetTool(id);syncMobileTools();};
+    window.setTool=function(id){oldSetTool(id);syncMobileTools();if(isMobile())closeDrawers();};
     syncMobileTools();
   }
 
@@ -151,6 +155,7 @@
     document.body.classList.toggle('mobile-mode',isMobile());
     closeDrawers();
     fitMap();
+    if(isMobile()&&CH>400)applyMapScale(Math.max(mobileScale,.65),false,{x:CW/2,y:CH/2});
     setTimeout(resize,60);
   }
 

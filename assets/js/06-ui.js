@@ -3,7 +3,7 @@
 /* ═══ F. UI ═════════════════════════════════════════════════ */
 
 let curTool='simple_house', curMat='wood',inspectMode=false;
-window.toggleInspect=function(){inspectMode=!inspectMode;el('inspect-btn')?.setAttribute('aria-pressed',String(inspectMode));$t('h-toolname',inspectMode?'Inspection':BLDGS[curTool]?.l);};
+window.toggleInspect=function(){inspectMode=!inspectMode;el('inspect-btn')?.setAttribute('aria-pressed',String(inspectMode));$t('h-toolname',inspectMode?'Inspection':BLDGS[curTool]?.l);window.closeMobileDrawers?.();};
 
 function buildTools(){
   const g=el('tool-grid');g.innerHTML='';
