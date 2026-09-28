@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION='0.2.1-alpha';
+const APP_VERSION='0.2.2-alpha';
 let worldBusy=false;
 
 function el(id){ return document.getElementById(id); }

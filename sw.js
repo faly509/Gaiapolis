@@ -1,12 +1,12 @@
 'use strict';
 // A versioned, immutable shell avoids mixing JavaScript from different releases.
 const PREFIX='gaiapolis:'+new URL(self.registration.scope).pathname+':';
-const CACHE=PREFIX+'v021a1';
+const CACHE=PREFIX+'v022a1';
 const APP_SHELL=[
   './','./index.html','./manifest.webmanifest','./assets/icon.svg',
   './assets/css/base.css','./assets/css/game.css','./assets/css/mobile.css','./assets/css/icons.css','./assets/css/experience.css',
   './assets/js/00-core.js','./assets/js/01-data.js','./assets/js/02-terrain.js','./assets/js/03-osm.js',
-  './assets/js/04-simulation.js','./assets/js/05-renderer.js','./assets/js/06-ui.js',
+  './assets/js/04-simulation.js','./assets/js/04-data-context.js','./assets/js/05-renderer.js','./assets/js/06-ui.js',
   './assets/js/06-storage.js','./assets/js/07-game.js','./assets/js/08-mobile.js'
 ];
 self.addEventListener('install',event=>{

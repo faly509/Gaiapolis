@@ -58,6 +58,13 @@ Les priorités peuvent évoluer selon les tests et les contributions.
 - [x] Icônes locales, cache limité à l’application et documentation du modèle
 - [ ] Validation sur smartphones physiques et téléphone pliable
 
+## ✅ v0.2.2-alpha — Origine des données (proposée)
+
+- [x] Fiche météo, OSM, ressources par tuile et limites du modèle
+- [x] Signalement des prévisions anciennes et expirées
+- [x] Date de chargement OSM conservée dans les sauvegardes
+- [x] Compatibilité des sauvegardes existantes et tests de non-mutation
+
 ## 🌍 v0.3.0 — Données territoriales améliorées
 
 - [ ] Vraie caméra cartographique avec MapLibre ou Leaflet
@@ -65,7 +72,7 @@ Les priorités peuvent évoluer selon les tests et les contributions.
 - [ ] Relief et pente issus d’un modèle numérique de terrain
 - [ ] Données solaires historiques adaptées à la planification
 - [ ] Hydrologie et risques mieux documentés
-- [ ] Niveau de confiance visible pour chaque donnée
+- [x] Origine et limites visibles par famille de données (v0.2.2; sans pourcentage de confiance artificiel)
 - [x] Export JSON du projet (v0.2.1)
 - [ ] Partage d’une ville par URL
 

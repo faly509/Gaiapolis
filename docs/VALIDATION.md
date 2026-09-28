@@ -1,3 +1,15 @@
+# Validation complémentaire — v0.2.2-alpha (28 septembre 2026)
+
+- 31 tests réussis : les 27 précédents et quatre tests de provenance, actualité météo, absence de mutation et conservation des dates OSM.
+- GitHub Actions « Validate static app » réussie, exécution n° 5, commit `929a17108132d3d156a041785ba9537b70dc50e1`.
+- Chromium : chargement de la version, ouverture de la fiche des sources, lecture des six catégories; contrôle du panneau au format téléphone 390 × 844.
+- Les alertes de prévisions expirées, anciennes et sans date sont vérifiées avec des dates fixes dans les tests, sans dépendre de services externes.
+- Aucun pourcentage de confiance n’est inventé; aucune donnée de terrain réelle supplémentaire n’est ajoutée.
+- Les limites de validation sur appareils physiques de la version précédente restent applicables.
+- Sauvegarde du code avant cette étape : `backup/2026-09-28-v0.2.1`, commit `24371b99a510cb455f7ec6d3e1ad3b058ef5fb29`. PR #4 basée sur la PR #3.
+
+---
+
 # Validation de Gaiapolis 0.2.1-alpha
 
 ## Tests automatiques

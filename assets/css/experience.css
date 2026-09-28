@@ -11,3 +11,13 @@ button,input,summary{font:inherit}button{cursor:pointer}button:disabled{opacity:
 
 #hud{min-height:33px;flex-shrink:0}#main-canvas{flex:none}#mat-dlg{z-index:200}#tut{inset:auto auto 12px 12px;max-width:min(320px,calc(100% - 76px));padding:0;background:none;pointer-events:none;z-index:45}#tut-box{padding:12px;pointer-events:auto}#tut-skip{min-height:30px;margin-left:8px}.tut-row{margin-bottom:8px}#tut .tut-txt{font-size:11px}#tut .tut-pips{margin-top:4px}
 @media(max-width:900px){#tut{bottom:calc(82px + env(safe-area-inset-bottom));left:8px;max-width:calc(100% - 68px);padding:0}#tut-box{max-width:100%;padding:10px}#tip{max-width:none}#mat-dlg{z-index:200}}
+
+/* Data provenance stays readable inside both desktop and mobile dashboards. */
+#sources-panel{margin:12px 10px;border:1px solid var(--b2);border-radius:8px;padding:10px;overflow-wrap:anywhere}
+#sources-panel summary{cursor:pointer;font-size:12px;color:var(--t1);min-height:28px;line-height:1.6}
+.source-item{padding:12px 0;border-top:1px solid var(--b1)}
+.source-item h3{font-size:12px;line-height:1.5;color:var(--t1);margin:0 0 5px}
+.source-status{display:inline-block;padding:2px 6px;border:1px solid var(--b2);border-radius:5px;font-size:10px;color:var(--am)}
+.source-item p,.source-footnote,#data-notice{font-size:11px;line-height:1.65;color:var(--t2);margin:7px 0 0}
+#data-notice{padding:8px;background:var(--bg3);border-left:3px solid var(--am);color:var(--am);margin-bottom:10px}
+@media(max-width:900px){#sources-panel summary{min-height:44px;display:list-item}.source-item p,.source-footnote,#data-notice{font-size:12px}}

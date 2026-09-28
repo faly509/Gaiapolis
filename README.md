@@ -3,7 +3,7 @@
 **Prototype open source de simulation de ville écologique et d’habitat autonome**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.2.1--alpha-orange.svg)]()
+[![Version](https://img.shields.io/badge/version-0.2.2--alpha-orange.svg)]()
 [![Status](https://img.shields.io/badge/status-public%20prototype-yellow.svg)]()
 [![Data](https://img.shields.io/badge/data-Open--Meteo%20%2B%20OpenStreetMap-blue.svg)]()
 [![Validate static app](https://github.com/faly509/Gaiapolis/actions/workflows/validate.yml/badge.svg)](https://github.com/faly509/Gaiapolis/actions/workflows/validate.yml)
@@ -16,9 +16,16 @@ Gaiapolis est un simulateur écologique jouable dans le navigateur. Le joueur ch
 
 > 🚧 **Statut :** prototype public expérimental. Les données, scores et recommandations sont des estimations simplifiées à but éducatif. Ce projet ne remplace pas une étude d’ingénierie, d’urbanisme ou de construction.
 
-## ✨ Fonctionnalités v0.2.1-alpha
+## ✨ Fonctionnalités v0.2.2-alpha
 
-### Nouveautés : fiabilité et autonomie
+### Nouveautés : origine des données
+
+- Fiche « Origine et limites des données » dans le diagnostic
+- Distinction météo prévue, objets OSM partiels et ressources simulées
+- Signalement des prévisions anciennes, expirées ou sans dates fiables
+- Dates de chargement OSM conservées dans les exports, sans inventer celles des anciennes parties
+
+### Fiabilité et autonomie
 
 - Sauvegarde automatique, copie de récupération, export/import JSON validé et retour à la carte précédente
 - Annuler/rétablir les 40 dernières constructions ou suppressions (Ctrl+Z / Ctrl+Maj+Z)

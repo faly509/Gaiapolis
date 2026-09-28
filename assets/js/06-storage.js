@@ -57,7 +57,7 @@ function validateProject(input){
   cl.source=['forecast','simulated','legacy'].includes(source.source)?source.source:(cl.lat!=null?'legacy':'simulated');
   cl.fetchedAt=Number.isFinite(source.fetchedAt)?source.fetchedAt:null;
   cl.period=Array.isArray(source.period)?source.period.filter(v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)).slice(0,7):[];
-  const os=input.osm||{},osmState={loaded:os.loaded===true};
+  const os=input.osm||{},osmState={loaded:os.loaded===true,fetchedAt:Number.isFinite(os.fetchedAt)&&os.fetchedAt>0&&os.fetchedAt<=8640000000000000?os.fetchedAt:null};
   for(const [k,max] of [['buildings',1e6],['roads',1e6],['waters',1e6],['radius',800]])osmState[k]=number(os[k]??0,0,max,k);
   const layers=Object.fromEntries(Object.keys(LYRON).map(k=>[k,typeof input.layers?.[k]==='boolean'?input.layers[k]:LYRON[k]]));
   const seed=Number.isInteger(input.terrainSeed)&&input.terrainSeed>=0?input.terrainSeed:42;

@@ -170,6 +170,7 @@ function updateAdvisor(s){
   $t('water-detail',`Pluie : ${s.rainWater} L/j · eaux grises : ${s.greyWater} L/j (non potables)`);
   $t('energy-detail',`Électricité : ${s.electric} · chaleur utile : ${s.heatUsed} kWh/j`);
   $t('data-status',climate.source==='forecast'?`Météo : prévisions 7 jours${climate.fetchedAt?' du '+new Date(climate.fetchedAt).toLocaleDateString('fr-FR'):''} · OSM : ${osm.loaded?'chargé':'indisponible'}`:climate.source==='legacy'?'Ancien climat : recharge le lieu pour actualiser les unités':'Mode démonstration · ressources simulées');
+  renderDataContext();
   if(el('scenario-panel').open)renderScenarios();
 }
 function renderScenarios(){

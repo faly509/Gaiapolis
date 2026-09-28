@@ -1,3 +1,11 @@
+# v0.2.2-alpha — 28 septembre 2026
+
+- Fiche des sources et limites dans le diagnostic, accessible sur ordinateur et mobile.
+- Distinction entre prévisions, données OSM partielles et terrain simulé.
+- Alerte de météo ancienne, expirée ou sans métadonnées temporelles.
+- Conservation de la date de chargement OSM; anciennes sauvegardes acceptées.
+- 4 tests supplémentaires, 31 tests au total.
+
 # Changelog — Gaiapolis / EcoCity Engine
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
