@@ -1,5 +1,5 @@
 <!--
-Gaiapolis / EcoCity Engine v0.2.1-alpha
+Gaiapolis / EcoCity Engine v0.2.2-alpha
 Author: Norbert Randriamaitso <norbert.randri@gmail.com>
 License: MIT
 Status: early public prototype — educational estimates, not engineering advice.
@@ -14,7 +14,7 @@ Data: Open-Meteo, Nominatim/OpenStreetMap, Overpass API.
 <meta name="theme-color" content="#151C10">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Gaiapolis — EcoCity Engine v0.2.1-alpha</title>
+<title>Gaiapolis — EcoCity Engine v0.2.2-alpha</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/icons.css">
@@ -25,7 +25,7 @@ Data: Open-Meteo, Nominatim/OpenStreetMap, Overpass API.
 </head>
 <body>
 <header id="hdr">
-  <span class="h-logo">🌍</span><span class="h-title">Gaiapolis</span><span class="h-ver">v0.2.1α</span>
+  <span class="h-logo">🌍</span><span class="h-title">Gaiapolis</span><span class="h-ver">v0.2.2α</span>
   <span class="h-loc" id="h-loc">Terrain simulé</span><div class="h-sep"></div>
   <span class="h-tool">Outil :</span><span id="h-toolname">Maison simple</span><span class="h-pill hp-r" id="h-score">Score 0%</span>
 </header>
@@ -72,12 +72,13 @@ Data: Open-Meteo, Nominatim/OpenStreetMap, Overpass API.
   <div class="met"><div class="met-hd">🏗️ Solidité <span id="mv-str">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-str" style="background:var(--ea)"></div></div></div>
   <div class="met"><div class="met-hd">😊 Confort <span id="mv-cf">0%</span></div><div class="met-bar"><div class="met-fill" id="mf-cf" style="background:var(--pu)"></div></div></div>
   <details id="scenario-panel" ontoggle="if(this.open)renderScenarios()"><summary>☀ Tester la résilience</summary><p>Même territoire, ressources réduites. Ces scénarios sont des hypothèses de jeu.</p><table><thead><tr><th>Conditions</th><th>Énergie</th><th>Eau</th><th>Alim.</th></tr></thead><tbody id="scenario-body"></tbody></table></details>
+  <details id="sources-panel" ontoggle="if(this.open)renderDataContext()"><summary id="sources-summary">Origine et limites des données</summary><p id="data-notice" role="status" hidden></p><div id="data-sources"></div><p class="source-footnote">Pour actualiser un lieu, exporte d’abord ta partie. Le chargement d’un lieu remplace la carte ; Retour carte permet de revenir au territoire précédent.</p></details>
   <div class="data-card"><p id="data-status"></p><p>Relief, débit, sol et géothermie : simulés. Scores éducatifs, sans validation de terrain.</p><small>* Indice illustratif : 800 kg de matériau par bâtiment. Ce n’est pas une analyse de cycle de vie.</small></div>
   <button class="opt-btn" onclick="findBest()"><i class="ti ti-crosshair"></i> Trouver les meilleurs emplacements</button>
   <div class="acc-h open" id="ah-obj" onclick="acc('obj')"><i class="ti ti-trophy"></i>Objectifs<span class="arrow"><i class="ti ti-chevron-down"></i></span></div><div class="acc-b" id="ab-obj"><div class="obj-list" id="obj-list"></div></div>
 </div></aside>
 </div>
 <div id="mat-dlg" role="dialog" aria-modal="true" aria-labelledby="mat-title"><div id="mat-box"><h2 id="mat-title">🧱 Choisir le matériau</h2><div id="mat-sub"></div><div class="mat-g" id="mat-g"></div><div class="mat-prev" id="mat-prev"></div><div class="dlg-btns"><button class="dbtn dno" onclick="closeMat(false)">Annuler</button><button class="dbtn dok" onclick="closeMat(true)">Construire →</button></div></div></div>
-<script src="assets/js/00-core.js"></script><script src="assets/js/01-data.js"></script><script src="assets/js/02-terrain.js"></script><script src="assets/js/03-osm.js"></script><script src="assets/js/04-simulation.js"></script><script src="assets/js/05-renderer.js"></script><script src="assets/js/06-ui.js"></script><script src="assets/js/06-storage.js"></script><script src="assets/js/07-game.js"></script><script src="assets/js/08-mobile.js"></script>
+<script src="assets/js/00-core.js"></script><script src="assets/js/01-data.js"></script><script src="assets/js/02-terrain.js"></script><script src="assets/js/03-osm.js"></script><script src="assets/js/04-simulation.js"></script><script src="assets/js/04-data-context.js"></script><script src="assets/js/05-renderer.js"></script><script src="assets/js/06-ui.js"></script><script src="assets/js/06-storage.js"></script><script src="assets/js/07-game.js"></script><script src="assets/js/08-mobile.js"></script>
 </body>
 </html>

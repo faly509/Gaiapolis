@@ -85,7 +85,7 @@ function applyOSMToTerrain(elements,cLat,cLon,radius,target=terrain){
       if(type==='water')t.water=Math.max(t.water,.85);
     }
   }
-  const result={loaded:true,buildings,roads,waters,radius};
+  const result={loaded:true,buildings,roads,waters,radius,fetchedAt:Date.now()};
   if(target===terrain)osm=result;
   return result;
 }

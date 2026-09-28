@@ -14,7 +14,7 @@ function core(){
   const ctx=vm.createContext({console,Date,Math,JSON,Number,Object,Array,Set,Map,AbortController,setTimeout,clearTimeout,
     document:{getElementById:element},window:{},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},
     navigator:{},Blob,URL});
-  for(const name of ['00-core','01-data','02-terrain','03-osm','04-simulation','06-storage'])vm.runInContext(fs.readFileSync(path.join(root,'assets/js',name+'.js'),'utf8'),ctx);
+  for(const name of ['00-core','01-data','02-terrain','03-osm','04-simulation','04-data-context','06-storage'])vm.runInContext(fs.readFileSync(path.join(root,'assets/js',name+'.js'),'utf8'),ctx);
   vm.runInContext(`const inG=(r,c)=>r>=0&&r<ISO.R&&c>=0&&c<ISO.C;
     let tutStep=0,tutDone=false,curTool='simple_house',curMat='wood',pendPl=null;
     function toast(){} function setTool(v){curTool=v;} function buildLayers(){} function buildTut(){} function buildObjs(){} function clearHL(){} function updateAll(){} function initAcc(){} function closeMat(){};
@@ -137,4 +137,35 @@ test('concurrent load is ignored while a world transition is pending',async()=>{
 test('saved unfinished tutorial retains its explicit progress',()=>{
   const c=core();flat(c);c.run(`placed['1,1']={id:'simple_house',mat:'wood'};tutStep=1;tutDone=false;`);
   const p=c.run('validateProject(copy(projectSnapshot()))');assert.equal(p.tutorial.done,false);assert.equal(p.tutorial.step,1);
+});
+
+
+test('data provenance distinguishes simulated terrain from partial real sources without mutation',()=>{
+  const c=core();const before=c.run('JSON.stringify({terrain,placed,climate,osm})');
+  const demo=c.run('dataContext()');assert.equal(demo.rows[0].status,'Simulée');assert.equal(demo.rows[1].status,'Simulés');
+  const real=c.run(`dataContext({source:'forecast',fetchedAt:Date.parse('2026-09-28T10:00:00Z'),period:['2026-09-28','2026-10-04']},{loaded:true,radius:500,buildings:0,roads:0,waters:0},Date.parse('2026-09-28T11:00:00Z'))`);
+  assert.equal(real.notice,'');assert.equal(real.rows[1].status,'OSM partiel');assert.equal(real.rows[2].status,'Prévisions + simulation');assert.equal(real.rows[3].status,'Simulés');
+  assert.match(real.rows[1].detail,/0 bâtiments/);assert.match(real.rows[1].detail,/ne prouve pas/);
+  assert.equal(c.run('JSON.stringify({terrain,placed,climate,osm})'),before);
+});
+test('weather provenance detects stale and expired forecasts even when download is recent',()=>{
+  const c=core();
+  const stale=c.run(`dataContext({source:'forecast',fetchedAt:Date.parse('2026-09-26T10:00:00Z'),period:['2026-09-26','2026-10-02']},{},Date.parse('2026-09-28T11:00:00Z'))`);
+  assert.equal(stale.rows[0].status,'À actualiser');
+  const expired=c.run(`dataContext({source:'forecast',fetchedAt:Date.parse('2026-09-28T10:00:00Z'),period:['2026-09-20','2026-09-26']},{},Date.parse('2026-09-28T11:00:00Z'))`);
+  assert.equal(expired.rows[0].status,'Expirée');assert.match(expired.notice,/encore la météo enregistrée/);
+});
+test('missing and future metadata cannot claim fresh measured data',()=>{
+  const c=core();
+  for(const fetchedAt of ['null','Infinity',"Date.parse('2099-01-01')"]){
+    const report=c.run(`dataContext({source:'forecast',fetchedAt:${fetchedAt},period:['2026-09-28']},{loaded:true},Date.parse('2026-09-28T11:00:00Z'))`);
+    assert.equal(report.rows[0].status,'Dates incomplètes');assert.match(report.rows[0].detail,/Date de chargement inconnue/);
+  }
+  assert.equal(c.run(`dataContext({source:'legacy'},{}).rows[0].status`),'À actualiser');
+});
+test('OSM acquisition timestamp survives save round-trip and old saves remain accepted',()=>{
+  const c=core();flat(c);c.run('applyOSMToTerrain([],0,0,500)');
+  const time=c.run('osm.fetchedAt');assert.ok(time>0);
+  assert.equal(c.run('validateProject(copy(projectSnapshot())).osm.fetchedAt'),time);
+  assert.equal(c.run('(()=>{const p=copy(projectSnapshot());delete p.osm.fetchedAt;return validateProject(p).osm.fetchedAt})()'),null);
 });

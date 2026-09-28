@@ -61,3 +61,11 @@ Ces facteurs sont des chocs de jeu, pas des prévisions météorologiques ni des
 ## Prochaines étapes structurantes
 
 Un moteur horaire, des réseaux potables/non potables, des stocks d’eau et de nourriture, du relief mesuré et des séries climatiques historiques doivent précéder toute prétention à un outil de planification réel. Une migration TypeScript ou MapLibre reste envisageable après stabilisation des interfaces du moteur; elle n’a pas été imposée dans cette révision.
+
+## Origine et actualité des données (v0.2.2)
+
+La fiche du diagnostic décrit la provenance de six familles de données. Elle ne calcule pas de probabilité de fiabilité. Les variations de soleil et de vent entre tuiles sont générées même lorsque la moyenne météo provient d’Open-Meteo. Les objets OSM sont une sélection partielle; une cellule vide ne prouve pas la constructibilité d’une parcelle. L’hydrologie reste simulée sur les cours d’eau OSM.
+
+Une prévision enregistrée depuis plus de 24 heures porte la mention « À actualiser ». La période est affichée avec les dates du lieu fournies par l’API; le repère d’expiration est le lendemain du dernier jour à 00:00 UTC, à titre d’alerte indicative. L’absence de période ou de date de chargement fiable est signalée. Aucun rechargement automatique ne modifie une ville existante.
+
+La date OSM indique le chargement dans le jeu, pas la date de mise à jour des objets sur OpenStreetMap. Les anciennes sauvegardes sans cette date restent lisibles et affichent « Date de chargement inconnue ».
